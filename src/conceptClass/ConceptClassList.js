@@ -90,7 +90,7 @@ class ConceptClassList extends React.Component {
             classesCheckedToDelete: classesCheckedToDelete,
           });
         })
-        .catch((error) => console.log(error));
+        .catch();
     }
   }
 
