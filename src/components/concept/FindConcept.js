@@ -1,7 +1,7 @@
 import React from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import Pagination from "../utils/Pagination";
+import Pagination from "../../utils/Pagination";
 
 class FindConcept extends React.Component {
   constructor(props) {
