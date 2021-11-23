@@ -1,7 +1,7 @@
 import React from "react";
-import axios from "axios";
 import { Link } from "react-router-dom";
-import Pagination from "../utils/Pagination";
+import Pagination from "../../utils/Pagination";
+import { getConcepts } from "../../api/services";
 
 class FindConcept extends React.Component {
   constructor(props) {
@@ -18,8 +18,7 @@ class FindConcept extends React.Component {
   }
 
   componentDidMount() {
-    axios
-      .get(`https://bahmni-cmm-default-rtdb.firebaseio.com/concept.json`)
+    getConcepts()
       .then((response) => {
         const loadedConcepts = [];
         for (const key in response.data) {
@@ -157,32 +156,36 @@ class FindConcept extends React.Component {
               currentConcepts.map((concept) => {
                 return (
                   <tr key={concept.id}>
-                    <Link to={`/concept/${concept.id}`}>
-                      <p>{concept.shortName}</p>
-                      {showDetails && <p>{concept.id}</p>}
-                    </Link>
+                    <td>
+                      <Link to={`/concept/${concept.id}`}>
+                        <p>{concept.shortName}</p>
+                        {showDetails && <p>{concept.id}</p>}
+                      </Link>
+                    </td>
                   </tr>
                 );
               })}
           </tbody>
           <tfoot>
             <tr>
-              {searchText && (
-                <div className="container">
-                  <span>
-                    Showing {indexOfFirstConcept + 1} to{" "}
-                    {indexOfLastConcept > filteredConcepts.length
-                      ? filteredConcepts.length
-                      : indexOfLastConcept}{" "}
-                    of {filteredConcepts.length} entries
-                  </span>
-                  <Pagination
-                    itemsPerPage={conceptsPerPage}
-                    totalItems={filteredConcepts.length}
-                    paginate={paginate.bind(this)}
-                  />
-                </div>
-              )}
+              <td>
+                {searchText && (
+                  <div className="container">
+                    <span>
+                      Showing {indexOfFirstConcept + 1} to{" "}
+                      {indexOfLastConcept > filteredConcepts.length
+                        ? filteredConcepts.length
+                        : indexOfLastConcept}{" "}
+                      of {filteredConcepts.length} entries
+                    </span>
+                    <Pagination
+                      itemsPerPage={conceptsPerPage}
+                      totalItems={filteredConcepts.length}
+                      paginate={paginate.bind(this)}
+                    />
+                  </div>
+                )}
+              </td>
             </tr>
             {searchText && (
               <tr>

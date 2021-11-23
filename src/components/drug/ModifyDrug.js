@@ -1,7 +1,13 @@
-import axios from "axios";
 import React from "react";
 import { withRouter, Redirect } from "react-router-dom";
 import Select from "react-select";
+import {
+  deleteDrugById,
+  getConcepts,
+  getDrugById,
+  postDrug,
+  putDrugById,
+} from "../../api/services";
 
 class ModifyDrug extends React.Component {
   constructor(props) {
@@ -32,9 +38,7 @@ class ModifyDrug extends React.Component {
 
   componentDidMount() {
     const { drugId } = this.state;
-
-    axios
-      .get(`https://bahmni-cmm-default-rtdb.firebaseio.com/concept.json`)
+    getConcepts()
       .then((response) => {
         const loadedOptions = [];
         for (const key in response.data) {
@@ -45,10 +49,7 @@ class ModifyDrug extends React.Component {
         }
         this.setState({ options: loadedOptions }, () => {
           if (drugId !== "add") {
-            axios
-              .get(
-                `https://bahmni-cmm-default-rtdb.firebaseio.com/drug/${drugId}.json`
-              )
+            getDrugById(drugId)
               .then((response) => {
                 this.setState({ drug: response.data }, () => {
                   const filtered = this.state.options.filter(
@@ -74,11 +75,7 @@ class ModifyDrug extends React.Component {
     const { drug, drugId } = this.state;
     drug.retired = false;
     this.setState({ drug: drug }, () => {
-      axios
-        .put(
-          `https://bahmni-cmm-default-rtdb.firebaseio.com/drug/${drugId}.json`,
-          drug
-        )
+      putDrugById(drugId, drug)
         .then(() => {
           this.setState({ redirect: "/drug" });
         })
@@ -147,8 +144,7 @@ class ModifyDrug extends React.Component {
   submitDrugFormHandler() {
     const { drug, drugId } = this.state;
     if (drugId === "add") {
-      axios
-        .post(`https://bahmni-cmm-default-rtdb.firebaseio.com/drug.json`, drug)
+      postDrug(drug)
         .then(() => {
           this.setState({ redirect: "/drug" });
         })
@@ -156,11 +152,7 @@ class ModifyDrug extends React.Component {
           console.log(error);
         });
     } else {
-      axios
-        .put(
-          `https://bahmni-cmm-default-rtdb.firebaseio.com/drug/${drugId}.json`,
-          drug
-        )
+      putDrugById(drugId, drug)
         .then(() => {
           this.setState({ redirect: "/drug" });
         })
@@ -178,25 +170,19 @@ class ModifyDrug extends React.Component {
     let { drug, drugId } = this.state;
     drug.retired = true;
     this.setState({ drug: drug }, () => {
-      axios
-        .put(
-          `https://bahmni-cmm-default-rtdb.firebaseio.com/drug/${drugId}.json`,
-          drug
-        )
+      putDrugById(drugId, drug)
         .then(() => {})
         .catch((error) => {
           console.log(error);
         });
+
       this.setState({ redirect: "/drug" });
     });
   }
 
   deleteDrug() {
     let { drugId } = this.state;
-    axios
-      .delete(
-        `https://bahmni-cmm-default-rtdb.firebaseio.com/drug/${drugId}.json`
-      )
+    deleteDrugById(drugId)
       .then(() => {
         this.setState({ redirect: "/drug" });
       })

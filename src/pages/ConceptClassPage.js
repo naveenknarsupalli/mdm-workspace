@@ -1,14 +1,15 @@
-import { Fragment } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
-import ConceptClassList from "../conceptClass/ConceptClassList";
+import ConceptClassList from "../components/conceptClass/ConceptClassList";
 
-const ConceptClassPage = (props) => {
+function ConceptClassPage() {
   return (
-    <Fragment>
+    <React.Fragment>
+      <h3>Concept Class Management</h3>
       <Link to="/conceptClass/add">Add Concept Class</Link>
       <ConceptClassList />
-    </Fragment>
+    </React.Fragment>
   );
-};
+}
 
 export default ConceptClassPage;
