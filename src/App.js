@@ -10,6 +10,8 @@ import ConceptClassPage from "./pages/ConceptClassPage";
 import ConceptPage from "./pages/ConceptPage";
 import DrugPage from "./pages/DrugPage";
 import NavBar from "./pages/NavBar";
+import ModifyRealationship from "./components/relationship/ModifyRelationship";
+import RelationshipPage from "./pages/RelationshipPage";
 
 function App() {
   return (
@@ -27,6 +29,12 @@ function App() {
 
         <Route path="/drug/:id" component={() => <ModifyDrug />} />
         <Route path="/drug" component={() => <DrugPage />} />
+
+        <Route
+          path="/relationship/:id"
+          component={() => <ModifyRealationship />}
+        />
+        <Route path="/relationship" component={() => <RelationshipPage />} />
       </Switch>
     </Fragment>
   );
