@@ -1,6 +1,6 @@
-import React, { Fragment } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import { getConcepts } from "../../api/services";
 
 class ConceptList extends React.Component {
   constructor(props) {
@@ -11,8 +11,7 @@ class ConceptList extends React.Component {
   }
 
   componentDidMount() {
-    axios
-      .get("https://bahmni-cmm-default-rtdb.firebaseio.com/concept.json")
+    getConcepts()
       .then((response) => {
         const loadedConcepts = [];
 
@@ -25,12 +24,14 @@ class ConceptList extends React.Component {
 
         this.setState({ concepts: loadedConcepts });
       })
-      .catch((error) => console.log(error));
+      .catch((error) => {
+        console.log(error);
+      });
   }
 
   render() {
     return (
-      <Fragment>
+      <React.Fragment>
         <ul>
           {this.state.concepts.map((concept) => {
             return (
@@ -42,7 +43,7 @@ class ConceptList extends React.Component {
             );
           })}
         </ul>
-      </Fragment>
+      </React.Fragment>
     );
   }
 }

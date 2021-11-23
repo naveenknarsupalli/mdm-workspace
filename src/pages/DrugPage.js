@@ -1,15 +1,15 @@
-import { Fragment } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
-import DrugList from "../drug/DrugList";
+import DrugList from "../components/drug/DrugList";
 
-const DrugPage = (props) => {
+function DrugPage() {
   return (
-    <Fragment>
+    <React.Fragment>
       <h3>Concept Drug Form</h3>
       <Link to="/drug/add">Add Concept Drug</Link>
       <DrugList />
-    </Fragment>
+    </React.Fragment>
   );
-};
+}
 
 export default DrugPage;

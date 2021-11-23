@@ -1,6 +1,11 @@
 import React, { Fragment } from "react";
 import { Redirect, withRouter } from "react-router-dom";
-import axios from "axios";
+import {
+  deleteConceptById,
+  getConceptById,
+  postConcept,
+  putConceptById,
+} from "../../api/services";
 
 class ModifyConcept extends React.Component {
   constructor(props) {
@@ -21,10 +26,7 @@ class ModifyConcept extends React.Component {
   componentDidMount() {
     const { conceptId } = this.state;
     if (conceptId !== "add") {
-      axios
-        .get(
-          `https://bahmni-cmm-default-rtdb.firebaseio.com/concept/${conceptId}.json`
-        )
+      getConceptById(conceptId)
         .then((response) => {
           this.setState({
             concept: {
@@ -44,11 +46,7 @@ class ModifyConcept extends React.Component {
     const { concept, conceptId } = this.state;
     concept.retired = false;
     this.setState({ concept: concept }, () => {
-      axios
-        .put(
-          `https://bahmni-cmm-default-rtdb.firebaseio.com/concept/${conceptId}.json`,
-          this.state.concept
-        )
+      putConceptById(conceptId, concept)
         .then()
         .catch((error) => console.log(error));
     });
@@ -69,24 +67,15 @@ class ModifyConcept extends React.Component {
   saveConcept(event) {
     event.preventDefault();
 
-    const { conceptId } = this.state;
+    const { conceptId, concept } = this.state;
     if (conceptId === "add") {
-      axios
-        .post(
-          "https://bahmni-cmm-default-rtdb.firebaseio.com/concept.json",
-          this.state.concept
-        )
+      postConcept(concept)
         .then(() => {
           this.setState({ redirect: "/concept" });
         })
         .catch((error) => console.log(error));
     } else {
-      console.log(this.state.concept);
-      axios
-        .put(
-          `https://bahmni-cmm-default-rtdb.firebaseio.com/concept/${conceptId}.json`,
-          this.state.concept
-        )
+      putConceptById(conceptId, concept)
         .then(() => {
           this.setState({ redirect: "/concept" });
         })
@@ -97,23 +86,15 @@ class ModifyConcept extends React.Component {
   saveConceptAndContinue(event) {
     event.preventDefault();
 
-    const { conceptId } = this.state;
+    const { conceptId, concept } = this.state;
     if (conceptId === "add") {
-      axios
-        .post(
-          "https://bahmni-cmm-default-rtdb.firebaseio.com/concept.json",
-          this.state.concept
-        )
+      postConcept(concept)
         .then((response) => {
           this.setState({ conceptId: response.data.name });
         })
         .catch((error) => console.log(error));
     } else {
-      axios
-        .put(
-          `https://bahmni-cmm-default-rtdb.firebaseio.com/concept/${conceptId}.json`,
-          this.state.concept
-        )
+      putConceptById(conceptId, concept)
         .then()
         .catch((error) => console.log(error));
     }
@@ -127,10 +108,7 @@ class ModifyConcept extends React.Component {
   deleteConcept(event) {
     event.preventDefault();
     const { conceptId } = this.state;
-    axios
-      .delete(
-        `https://bahmni-cmm-default-rtdb.firebaseio.com/concept/${conceptId}.json`
-      )
+    deleteConceptById(conceptId)
       .then(() => {
         this.setState({ redirect: "/concept" });
       })
@@ -148,11 +126,7 @@ class ModifyConcept extends React.Component {
     const { concept, conceptId } = this.state;
     concept.retired = true;
     this.setState({ concept: concept }, () => {
-      axios
-        .put(
-          `https://bahmni-cmm-default-rtdb.firebaseio.com/concept/${conceptId}.json`,
-          this.state.concept
-        )
+      putConceptById(conceptId, concept)
         .then()
         .catch((error) => console.log(error));
     });
