@@ -1,6 +1,11 @@
 import axios from "axios";
 
-import { CONCEPT, CONCEPT_CLASS, DRUG } from "../constants/serviceConstants";
+import {
+  CONCEPT,
+  CONCEPT_CLASS,
+  DRUG,
+  RELATIONSHIP,
+} from "../constants/serviceConstants";
 
 const SUFFIX = `.json`;
 
@@ -50,3 +55,19 @@ export const putDrugById = (id, body) =>
 
 export const deleteDrugById = (id) =>
   axios.delete(`${DRUG}/${id}${SUFFIX}`).then((res) => res);
+
+// relationship apis
+export const getRelationships = () =>
+  axios.get(`${RELATIONSHIP}${SUFFIX}`).then((res) => res);
+
+export const getRelationshipById = (id) =>
+  axios.get(`${RELATIONSHIP}/${id}${SUFFIX}`).then((res) => res);
+
+export const postRelationship = (body) =>
+  axios.post(`${RELATIONSHIP}${SUFFIX}`, body).then((res) => res);
+
+export const putRelationshipById = (id, body) =>
+  axios.put(`${RELATIONSHIP}/${id}${SUFFIX}`, body).then((res) => res);
+
+export const deleteRelationshipById = (id) =>
+  axios.delete(`${RELATIONSHIP}/${id}${SUFFIX}`).then((res) => res);
