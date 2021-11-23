@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import { getDrugs } from "../../api/services";
 
 class DrugList extends React.Component {
   constructor(props) {
@@ -13,8 +13,7 @@ class DrugList extends React.Component {
   }
 
   componentDidMount() {
-    axios
-      .get("https://bahmni-cmm-default-rtdb.firebaseio.com/drug.json")
+    getDrugs()
       .then((response) => {
         const loadedDrugs = [];
 

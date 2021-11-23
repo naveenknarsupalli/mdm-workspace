@@ -1,6 +1,11 @@
 import React from "react";
 import { Redirect, withRouter } from "react-router-dom";
-import axios from "axios";
+import {
+  deleteConceptClassById,
+  getConceptClassById,
+  postConceptClass,
+  putConceptClassById,
+} from "../../api/services";
 
 class ModifyConceptClass extends React.Component {
   constructor(props) {
@@ -17,10 +22,7 @@ class ModifyConceptClass extends React.Component {
   componentDidMount() {
     const conceptClassId = this.props.match.params.id;
     if (conceptClassId !== "add") {
-      axios
-        .get(
-          `https://bahmni-cmm-default-rtdb.firebaseio.com/conceptClass/${conceptClassId}.json`
-        )
+      getConceptClassById(conceptClassId)
         .then((response) => {
           this.setState({ conceptClass: response.data });
         })
@@ -52,13 +54,10 @@ class ModifyConceptClass extends React.Component {
 
   submitHandler(event) {
     event.preventDefault();
+    const { conceptClass } = this.state;
     const conceptClassId = this.props.match.params.id;
     if (conceptClassId === "add") {
-      axios
-        .post(
-          "https://bahmni-cmm-default-rtdb.firebaseio.com/conceptClass.json",
-          this.state.conceptClass
-        )
+      postConceptClass(conceptClass)
         .then(() => {
           this.setState({ redirect: "/conceptClass" });
         })
@@ -66,11 +65,7 @@ class ModifyConceptClass extends React.Component {
           console.log(error);
         });
     } else {
-      axios
-        .put(
-          `https://bahmni-cmm-default-rtdb.firebaseio.com/conceptClass/${conceptClassId}.json`,
-          this.state.conceptClass
-        )
+      putConceptClassById(conceptClassId, conceptClass)
         .then(() => {
           this.setState({ redirect: "/conceptClass" });
         })
@@ -91,11 +86,7 @@ class ModifyConceptClass extends React.Component {
 
     const conceptClassId = this.props.match.params.id;
     this.setState({ conceptClass: conceptClass }, () => {
-      axios
-        .put(
-          `https://bahmni-cmm-default-rtdb.firebaseio.com/conceptClass/${conceptClassId}.json`,
-          this.state.conceptClass
-        )
+      putConceptClassById(conceptClassId, conceptClass)
         .then(() => {
           this.setState({ redirect: "/conceptClass" });
         })
@@ -108,11 +99,7 @@ class ModifyConceptClass extends React.Component {
   deleteConceptClass(event) {
     event.preventDefault();
     const conceptClassId = this.props.match.params.id;
-
-    axios
-      .delete(
-        `https://bahmni-cmm-default-rtdb.firebaseio.com/conceptClass/${conceptClassId}.json`
-      )
+    deleteConceptClassById(conceptClassId)
       .then(() => {
         this.setState({ redirect: "/conceptClass" });
       })

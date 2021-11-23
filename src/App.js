@@ -3,9 +3,9 @@ import { Switch, Route } from "react-router-dom";
 
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import ModifyConcept from "./concept/ModifyConcept";
-import ModifyConceptClass from "./conceptClass/ModifyConceptClass";
-import ModifyDrug from "./drug/ModifyDrug";
+import ModifyConcept from "./components/concept/ModifyConcept";
+import ModifyConceptClass from "./components/conceptClass/ModifyConceptClass";
+import ModifyDrug from "./components/drug/ModifyDrug";
 import ConceptClassPage from "./pages/ConceptClassPage";
 import ConceptPage from "./pages/ConceptPage";
 import DrugPage from "./pages/DrugPage";

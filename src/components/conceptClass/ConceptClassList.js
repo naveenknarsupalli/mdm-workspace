@@ -1,6 +1,6 @@
 import React, { Fragment } from "react";
 import { Link, Redirect } from "react-router-dom";
-import axios from "axios";
+import { deleteConceptById, getConceptClasses } from "../../api/services";
 
 class ConceptClassList extends React.Component {
   constructor(props) {
@@ -14,8 +14,7 @@ class ConceptClassList extends React.Component {
   }
 
   componentDidMount() {
-    axios
-      .get("https://bahmni-cmm-default-rtdb.firebaseio.com/conceptClass.json")
+    getConceptClasses()
       .then((response) => {
         const loadedConceptClasses = [];
         const classesCheckedToDelete = [];
@@ -52,9 +51,7 @@ class ConceptClassList extends React.Component {
   componentDidUpdate(prevProps, prevState) {
     if (prevState.showRetired !== this.state.showRetired) {
       const classesCheckedToDelete = [];
-
-      axios
-        .get("https://bahmni-cmm-default-rtdb.firebaseio.com/conceptClass.json")
+      getConceptClasses()
         .then((response) => {
           const loadedConceptClasses = [];
           for (const key in response.data) {
@@ -118,10 +115,7 @@ class ConceptClassList extends React.Component {
 
     for (let i = 0; i < len; i++) {
       const deleteId = conceptClassesToDelete[i].conceptClassId;
-      axios
-        .delete(
-          `https://bahmni-cmm-default-rtdb.firebaseio.com/conceptClass/${deleteId}.json`
-        )
+      deleteConceptById(deleteId)
         .then(() => {
           if (i === len - 1) {
             window.location.reload();
