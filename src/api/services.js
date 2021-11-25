@@ -4,6 +4,7 @@ import {
   CONCEPT,
   CONCEPT_CLASS,
   DRUG,
+  PRIVILEGE,
   RELATIONSHIP,
 } from "../constants/serviceConstants";
 
@@ -55,6 +56,22 @@ export const putDrugById = (id, body) =>
 
 export const deleteDrugById = (id) =>
   axios.delete(`${DRUG}/${id}${SUFFIX}`).then((res) => res);
+
+// privilege apis
+export const getPrivileges = () =>
+  axios.get(`${PRIVILEGE}${SUFFIX}`).then((res) => res);
+
+export const getPrivilegeById = (id) =>
+  axios.get(`${PRIVILEGE}/${id}${SUFFIX}`).then((res) => res);
+
+export const postPrivilege = (body) =>
+  axios.post(`${PRIVILEGE}${SUFFIX}`, body).then((res) => res);
+
+export const putPrivilegeById = (id, body) =>
+  axios.put(`${PRIVILEGE}/${id}${SUFFIX}`, body).then((res) => res);
+
+export const deletePrivilegeById = (id) =>
+  axios.delete(`${PRIVILEGE}/${id}${SUFFIX}`).then((res) => res);
 
 // relationship apis
 export const getRelationships = () =>

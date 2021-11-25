@@ -42,12 +42,6 @@ class ConceptClassList extends React.Component {
       .catch((error) => console.log(error));
   }
 
-  componentWillUnmount() {
-    console.log("unmounted");
-  }
-
-  compon;
-
   componentDidUpdate(prevProps, prevState) {
     if (prevState.showRetired !== this.state.showRetired) {
       const classesCheckedToDelete = [];

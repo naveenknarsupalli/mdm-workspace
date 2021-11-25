@@ -8,6 +8,7 @@ function NavBar() {
       <Link to="/conceptClass"> Concept Classes </Link> |
       <Link to="/drug"> Drugs </Link> |
       <Link to="/relationship"> Relationship </Link> |
+      <Link to="/privilege"> Privilege </Link> |
       <hr />
     </div>
   );
