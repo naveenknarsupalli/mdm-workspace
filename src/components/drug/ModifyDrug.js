@@ -212,15 +212,7 @@ class ModifyDrug extends React.Component {
       deleteDrug,
     } = this;
 
-    const {
-      drug,
-      redirect,
-      drugId,
-      options,
-      defaultConceptIdValue,
-      defaultDosageFormValue,
-      startRender,
-    } = this.state;
+    const { drug, redirect, drugId, options, startRender } = this.state;
 
     const getDefaultConceptIdValue = options.filter(
       (option) => option.value === drug.conceptId
@@ -237,8 +229,6 @@ class ModifyDrug extends React.Component {
     if (startRender || drugId === "add") {
       return (
         <React.Fragment>
-          {console.log("concept", getDefaultConceptIdValue)}
-          {console.log("dosage", getDefaultDosageFormValue)}
           <p>Concept Drug Management</p>
           {drug.retired && (
             <p>
@@ -273,8 +263,6 @@ class ModifyDrug extends React.Component {
                 filterOption={filterOptions}
               />
             </div>
-
-            {console.log("concept", defaultConceptIdValue)}
 
             <br />
             <label htmlFor="combination">Combination: </label>
