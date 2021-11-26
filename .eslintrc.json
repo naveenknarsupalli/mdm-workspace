@@ -1,9 +1,17 @@
 {
-    "extends": "airbnb"
-    // "react/function-component-definition": [
-    //     2,
-    //     {
-    //       "namedComponents": "function-declaration"
+    "extends": "airbnb",
+    "env": {
+        "browser": true,
+        "node": true,
+        "jasmine": true
+      }
+    // "trailing-comma": [true, {
+    //     "singleline": "never",
+    //     "multiline": {
+    //         "objects": "always",    
+    //         "arrays": "always",
+    //         "functions": "never",
+    //         "typeLiterals": "ignore"
     //     }
-    //   ]    
+    // }]    
 }

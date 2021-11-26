@@ -1,33 +1,37 @@
-import React from "react";
-import { withRouter, Redirect } from "react-router-dom";
+/* eslint-disable no-console */
+import React from 'react';
+import { withRouter, Redirect } from 'react-router-dom';
+import PropTypes from 'prop-types';
+
 import {
   deleteRelationshipById,
   getRelationshipById,
   postRelationship,
   putRelationshipById,
-} from "../../api/services";
+} from '../../api/services';
 
 class ModifyRealationship extends React.Component {
   constructor(props) {
     super(props);
     const initialRelationshipState = {
-      aIsToB: "",
-      bIsToA: "",
-      description: "",
-      retireReason: "",
+      aIsToB: '',
+      bIsToA: '',
+      description: '',
+      retireReason: '',
       retired: false,
     };
 
+    // const { id } = props.match.params;
     this.state = {
       relationship: initialRelationshipState,
-      relationshipId: this.props.match.params.id,
+      relationshipId: props.match.params.id,
       redirect: null,
     };
   }
 
   componentDidMount() {
     const { relationshipId } = this.state;
-    if (relationshipId !== "add") {
+    if (relationshipId !== 'add') {
       getRelationshipById(relationshipId)
         .then((response) => {
           this.setState({ relationship: response.data });
@@ -41,27 +45,27 @@ class ModifyRealationship extends React.Component {
   aIsToBChangeHandler(event) {
     const { relationship } = this.state;
     relationship.aIsToB = event.target.value;
-    this.setState({ relationship: relationship });
+    this.setState({ relationship });
   }
 
   bIsToAChangeHandler(event) {
     const { relationship } = this.state;
     relationship.bIsToA = event.target.value;
-    this.setState({ relationship: relationship });
+    this.setState({ relationship });
   }
 
   descriptionChangeHandler(event) {
     const { relationship } = this.state;
     relationship.description = event.target.value;
-    this.setState({ relationship: relationship });
+    this.setState({ relationship });
   }
 
   saveRelationship() {
     const { relationshipId, relationship } = this.state;
-    if (relationshipId === "add") {
+    if (relationshipId === 'add') {
       postRelationship(relationship)
         .then(() => {
-          this.setState({ redirect: "/relationship" });
+          this.setState({ redirect: '/relationship' });
         })
         .catch((error) => {
           console.log(error);
@@ -69,7 +73,7 @@ class ModifyRealationship extends React.Component {
     } else {
       putRelationshipById(relationshipId, relationship)
         .then(() => {
-          this.setState({ redirect: "/relationship" });
+          this.setState({ redirect: '/relationship' });
         })
         .catch((error) => {
           console.log(error);
@@ -80,16 +84,16 @@ class ModifyRealationship extends React.Component {
   retireReasonChangeHandler(event) {
     const { relationship } = this.state;
     relationship.retireReason = event.target.value;
-    this.setState({ relationship: relationship });
+    this.setState({ relationship });
   }
 
   retireRelationship() {
     const { relationshipId, relationship } = this.state;
     relationship.retired = true;
-    this.setState({ relationship: relationship }, () => {
+    this.setState({ relationship }, () => {
       putRelationshipById(relationshipId, relationship)
         .then(() => {
-          this.setState({ redirect: "/relationship" });
+          this.setState({ redirect: '/relationship' });
         })
         .catch((error) => {
           console.log(error);
@@ -99,12 +103,12 @@ class ModifyRealationship extends React.Component {
 
   unretireRelationship() {
     const { relationshipId, relationship } = this.state;
-    relationship.retireReason = "";
+    relationship.retireReason = '';
     relationship.retired = false;
-    this.setState({ relationship: relationship }, () => {
+    this.setState({ relationship }, () => {
       putRelationshipById(relationshipId, relationship)
         .then(() => {
-          this.setState({ redirect: "/relationship" });
+          this.setState({ redirect: '/relationship' });
         })
         .catch((error) => {
           console.log(error);
@@ -116,7 +120,7 @@ class ModifyRealationship extends React.Component {
     const { relationshipId } = this.state;
     deleteRelationshipById(relationshipId)
       .then(() => {
-        this.setState({ redirect: "/relationship" });
+        this.setState({ redirect: '/relationship' });
       })
       .catch((error) => {
         console.log(error);
@@ -139,38 +143,44 @@ class ModifyRealationship extends React.Component {
     if (redirect) return <Redirect to={redirect} />;
 
     return (
-      <React.Fragment>
+      <>
         <div>
-          <label htmlFor="aIsToB">A is to B*: </label>
-          <input
-            type="text"
-            id="aIsToB"
-            name="aIsToB"
-            value={relationship.aIsToB}
-            onChange={aIsToBChangeHandler.bind(this)}
-          />
-          <br />
+          <label htmlFor="aIsToB">
+            A is to B*:
+            <input
+              type="text"
+              id="aIsToB"
+              name="aIsToB"
+              value={relationship.aIsToB}
+              onChange={aIsToBChangeHandler.bind(this)}
+            />
+            <br />
+          </label>
 
-          <label htmlFor="bIsToA">B is to A*: </label>
-          <input
-            type="text"
-            id="bIsToA"
-            name="bIsToA"
-            value={relationship.bIsToA}
-            onChange={bIsToAChangeHandler.bind(this)}
-          />
-          <br />
+          <label htmlFor="bIsToA">
+            B is to A*:
+            <input
+              type="text"
+              id="bIsToA"
+              name="bIsToA"
+              value={relationship.bIsToA}
+              onChange={bIsToAChangeHandler.bind(this)}
+            />
+            <br />
+          </label>
 
-          <label htmlFor="description">Description: </label>
-          <textarea
-            id="description"
-            name="description"
-            rows="3"
-            cols="20"
-            value={relationship.description}
-            onChange={descriptionChangeHandler.bind(this)}
-          />
-          <br />
+          <label htmlFor="description">
+            Description:
+            <textarea
+              id="description"
+              name="description"
+              rows="3"
+              cols="20"
+              value={relationship.description}
+              onChange={descriptionChangeHandler.bind(this)}
+            />
+            <br />
+          </label>
 
           <button type="button" onClick={saveRelationship.bind(this)}>
             Save Relationship Type
@@ -178,19 +188,23 @@ class ModifyRealationship extends React.Component {
           <br />
         </div>
 
-        {relationshipId !== "add" && !relationship.retired && (
+        {relationshipId !== 'add' && !relationship.retired && (
           <div>
             <hr />
+
             <p>Retire Relationship Type</p>
-            <label htmlFor="retireReason">Reason: </label>
-            <input
-              type="text"
-              id="retireReason"
-              name="retireReason"
-              value={relationship.retireReason}
-              onChange={retireReasonChangeHandler.bind(this)}
-            />
-            <br />
+
+            <label htmlFor="retireReason">
+              Reason:
+              <input
+                type="text"
+                id="retireReason"
+                name="retireReason"
+                value={relationship.retireReason}
+                onChange={retireReasonChangeHandler.bind(this)}
+              />
+              <br />
+            </label>
 
             <button type="button" onClick={retireRelationship.bind(this)}>
               Retire Relationship Type
@@ -199,7 +213,7 @@ class ModifyRealationship extends React.Component {
           </div>
         )}
 
-        {relationshipId !== "add" && relationship.retired && (
+        {relationshipId !== 'add' && relationship.retired && (
           <div>
             <hr />
 
@@ -212,18 +226,28 @@ class ModifyRealationship extends React.Component {
           </div>
         )}
 
-        {relationshipId !== "add" && (
+        {relationshipId !== 'add' && (
           <div>
             <hr />
 
             <p>Delete Relationship Type Forever</p>
+
             <button type="button" onClick={deleteRelationship.bind(this)}>
               Delete Relationship Type Forever
             </button>
           </div>
         )}
-      </React.Fragment>
+      </>
     );
   }
 }
+
+ModifyRealationship.propTypes = {
+  match: PropTypes.shape({
+    params: PropTypes.shape({
+      id: PropTypes.node,
+    }).isRequired,
+  }).isRequired,
+};
+
 export default withRouter(ModifyRealationship);

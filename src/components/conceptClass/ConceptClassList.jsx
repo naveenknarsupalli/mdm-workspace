@@ -1,6 +1,7 @@
-import React, { Fragment } from "react";
-import { Link, Redirect } from "react-router-dom";
-import { deleteConceptById, getConceptClasses } from "../../api/services";
+/* eslint-disable no-console */
+import React, { Fragment } from 'react';
+import { Link, Redirect } from 'react-router-dom';
+import { deleteConceptById, getConceptClasses } from '../../api/services';
 
 class ConceptClassList extends React.Component {
   constructor(props) {
@@ -19,7 +20,7 @@ class ConceptClassList extends React.Component {
         const loadedConceptClasses = [];
         const classesCheckedToDelete = [];
 
-        for (const key in response.data) {
+        Object.keys(response.data).forEach((key) => {
           if (!response.data[key].retired) {
             loadedConceptClasses.push({
               conceptClassId: key,
@@ -32,24 +33,25 @@ class ConceptClassList extends React.Component {
               isChecked: false,
             });
           }
-        }
+        });
 
         this.setState({
           conceptClasses: loadedConceptClasses,
-          classesCheckedToDelete: classesCheckedToDelete,
+          classesCheckedToDelete,
         });
       })
       .catch((error) => console.log(error));
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (prevState.showRetired !== this.state.showRetired) {
+    const { showRetired } = this.state;
+    if (prevState.showRetired !== showRetired) {
       const classesCheckedToDelete = [];
       getConceptClasses()
         .then((response) => {
           const loadedConceptClasses = [];
-          for (const key in response.data) {
-            if (this.state.showRetired) {
+          Object.keys(response.data).forEach((key) => {
+            if (showRetired) {
               loadedConceptClasses.push({
                 conceptClassId: key,
                 name: response.data[key].name,
@@ -60,54 +62,52 @@ class ConceptClassList extends React.Component {
                 conceptClassId: key,
                 isChecked: false,
               });
-            } else {
-              if (!response.data[key].retired) {
-                loadedConceptClasses.push({
-                  conceptClassId: key,
-                  name: response.data[key].name,
-                  description: response.data[key].description,
-                });
+            } else if (!response.data[key].retired) {
+              loadedConceptClasses.push({
+                conceptClassId: key,
+                name: response.data[key].name,
+                description: response.data[key].description,
+              });
 
-                classesCheckedToDelete.push({
-                  conceptClassId: key,
-                  isChecked: false,
-                });
-              }
+              classesCheckedToDelete.push({
+                conceptClassId: key,
+                isChecked: false,
+              });
             }
-          }
+          });
 
           this.setState({
             conceptClasses: loadedConceptClasses,
-            classesCheckedToDelete: classesCheckedToDelete,
+            classesCheckedToDelete,
           });
         })
         .catch((error) => console.log(error));
     }
   }
 
-  toggleRetired(event) {
-    event.preventDefault();
-    this.setState({ showRetired: !this.state.showRetired });
+  toggleRetired() {
+    const { showRetired } = this.state;
+    this.setState({ showRetired: !showRetired });
   }
 
   checkboxChangeHandler(event) {
     const { classesCheckedToDelete } = this.state;
     const index = classesCheckedToDelete.findIndex(
-      (obj) => obj.conceptClassId === event.target.id
+      (obj) => obj.conceptClassId === event.target.id,
     );
     classesCheckedToDelete[index].isChecked = event.target.checked;
-    this.setState({ classesCheckedToDelete: classesCheckedToDelete });
+    this.setState({ classesCheckedToDelete });
   }
 
-  deleteCheckedConceptClassesHandler(event) {
-    event.preventDefault();
-    const conceptClassesToDelete = this.state.classesCheckedToDelete.filter(
-      (obj) => obj.isChecked === true
+  deleteCheckedConceptClassesHandler() {
+    const { classesCheckedToDelete } = this.state;
+    const conceptClassesToDelete = classesCheckedToDelete.filter(
+      (obj) => obj.isChecked === true,
     );
 
     const len = conceptClassesToDelete.length;
 
-    for (let i = 0; i < len; i++) {
+    for (let i = 0; i < len; i += 1) {
       const deleteId = conceptClassesToDelete[i].conceptClassId;
       deleteConceptById(deleteId)
         .then(() => {
@@ -122,13 +122,13 @@ class ConceptClassList extends React.Component {
   }
 
   render() {
-    const { redirect } = this.state;
+    const { redirect, conceptClasses } = this.state;
     if (redirect) {
       return <Redirect to={redirect} />;
     }
 
     return (
-      <Fragment>
+      <>
         <h3>Manage Concept Classes</h3>
         <button type="button" onClick={this.toggleRetired.bind(this)}>
           Toggle Retired
@@ -136,41 +136,40 @@ class ConceptClassList extends React.Component {
         <table>
           <thead>
             <tr>
-              <th></th>
+              <th>..</th>
               <th>Name</th>
               <th>Description</th>
             </tr>
           </thead>
 
           <tbody>
-            {this.state.conceptClasses.map((conceptClass) => {
-              return (
-                <tr key={conceptClass.conceptClassId}>
-                  <td>
-                    <input
-                      type="checkbox"
-                      id={conceptClass.conceptClassId}
-                      onChange={this.checkboxChangeHandler.bind(this)}
-                    />
-                  </td>
-                  <td>
-                    <Link to={`/conceptClass/${conceptClass.conceptClassId}`}>
-                      {conceptClass.name}
-                    </Link>
-                  </td>
-                  <td>{conceptClass.description}</td>
-                </tr>
-              );
-            })}
+            {conceptClasses.map((conceptClass) => (
+              <tr key={conceptClass.conceptClassId}>
+                <td>
+                  <input
+                    type="checkbox"
+                    id={conceptClass.conceptClassId}
+                    onChange={this.checkboxChangeHandler.bind(this)}
+                  />
+                </td>
+                <td>
+                  <Link to={`/conceptClass/${conceptClass.conceptClassId}`}>
+                    {conceptClass.name}
+                  </Link>
+                </td>
+                <td>{conceptClass.description}</td>
+              </tr>
+            ))}
           </tbody>
         </table>
+
         <button
           type="button"
           onClick={this.deleteCheckedConceptClassesHandler.bind(this)}
         >
           Delete Checked Concept Classes
         </button>
-      </Fragment>
+      </>
     );
   }
 }

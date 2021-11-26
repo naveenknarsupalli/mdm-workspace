@@ -1,13 +1,15 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { deletePrivilegeById, getPrivileges } from "../../api/services";
+/* eslint-disable comma-dangle */
+/* eslint-disable no-console */
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { deletePrivilegeById, getPrivileges } from '../../api/services';
+
 class PrivilegeList extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       privileges: [],
       privilegesCheckedToDelete: [],
-      redirect: null,
     };
   }
 
@@ -17,19 +19,20 @@ class PrivilegeList extends React.Component {
         const loadedPrivileges = [];
         const privilegesCheckedToDelete = [];
 
-        for (const key in response.data) {
-          let priv = response.data[key];
-          priv["id"] = key;
+        Object.keys(response.data).forEach((key) => {
+          const priv = response.data[key];
+          priv.id = key;
           loadedPrivileges.push(priv);
 
           privilegesCheckedToDelete.push({
             privilegeId: key,
             isChecked: false,
           });
-        }
+        });
+
         this.setState({
           privileges: loadedPrivileges,
-          privilegesCheckedToDelete: privilegesCheckedToDelete,
+          privilegesCheckedToDelete,
         });
       })
       .catch((error) => {
@@ -43,17 +46,18 @@ class PrivilegeList extends React.Component {
       (obj) => obj.privilegeId === event.target.id
     );
     privilegesCheckedToDelete[index].isChecked = event.target.checked;
-    this.setState({ privilegesCheckedToDelete: privilegesCheckedToDelete });
+    this.setState({ privilegesCheckedToDelete });
   }
 
-  deleteCheckedPrivilegesHandler(event) {
-    const privilegesToDelete = this.state.privilegesCheckedToDelete.filter(
+  deleteCheckedPrivilegesHandler() {
+    const { privilegesCheckedToDelete } = this.state;
+    const privilegesToDelete = privilegesCheckedToDelete.filter(
       (obj) => obj.isChecked === true
     );
 
     const len = privilegesToDelete.length;
 
-    for (let i = 0; i < len; i++) {
+    for (let i = 0; i < len; i += 1) {
       const deleteId = privilegesToDelete[i].privilegeId;
       deletePrivilegeById(deleteId)
         .then(() => {
@@ -71,7 +75,7 @@ class PrivilegeList extends React.Component {
     const { privileges } = this.state;
     const { checkboxChangeHandler, deleteCheckedPrivilegesHandler } = this;
     return (
-      <React.Fragment>
+      <>
         <table>
           <thead>
             <tr>
@@ -81,29 +85,27 @@ class PrivilegeList extends React.Component {
 
           <tbody>
             <tr>
-              <td></td>
+              <td />
               <td>Privilege Name</td>
               <td>Description</td>
             </tr>
-            {privileges.map((privilege) => {
-              return (
-                <tr key={privilege.id}>
-                  <td>
-                    <input
-                      type="checkbox"
-                      id={privilege.id}
-                      onChange={checkboxChangeHandler.bind(this)}
-                    />
-                  </td>
-                  <td>
-                    <Link to={`/privilege/${privilege.id}`}>
-                      {privilege.privilege}
-                    </Link>
-                  </td>
-                  <td>{privilege.description}</td>
-                </tr>
-              );
-            })}
+            {privileges.map((privilege) => (
+              <tr key={privilege.id}>
+                <td>
+                  <input
+                    type="checkbox"
+                    id={privilege.id}
+                    onChange={checkboxChangeHandler.bind(this)}
+                  />
+                </td>
+                <td>
+                  <Link to={`/privilege/${privilege.id}`}>
+                    {privilege.privilege}
+                  </Link>
+                </td>
+                <td>{privilege.description}</td>
+              </tr>
+            ))}
           </tbody>
         </table>
         <button
@@ -112,7 +114,7 @@ class PrivilegeList extends React.Component {
         >
           Delete Selected Privileges
         </button>
-      </React.Fragment>
+      </>
     );
   }
 }
