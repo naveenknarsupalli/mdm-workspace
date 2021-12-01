@@ -1,4 +1,3 @@
-/* eslint-disable comma-dangle */
 /* eslint-disable no-console */
 import React from 'react';
 import { Link } from 'react-router-dom';
@@ -43,7 +42,7 @@ class PrivilegeList extends React.Component {
   checkboxChangeHandler(event) {
     const { privilegesCheckedToDelete } = this.state;
     const index = privilegesCheckedToDelete.findIndex(
-      (obj) => obj.privilegeId === event.target.id
+      (obj) => obj.privilegeId === event.target.id,
     );
     privilegesCheckedToDelete[index].isChecked = event.target.checked;
     this.setState({ privilegesCheckedToDelete });
@@ -52,7 +51,7 @@ class PrivilegeList extends React.Component {
   deleteCheckedPrivilegesHandler() {
     const { privilegesCheckedToDelete } = this.state;
     const privilegesToDelete = privilegesCheckedToDelete.filter(
-      (obj) => obj.isChecked === true
+      (obj) => obj.isChecked === true,
     );
 
     const len = privilegesToDelete.length;

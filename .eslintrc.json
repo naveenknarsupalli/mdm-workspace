@@ -1,17 +1,27 @@
 {
     "extends": "airbnb",
-    "env": {
-        "browser": true,
-        "node": true,
-        "jasmine": true
-      }
-    // "trailing-comma": [true, {
-    //     "singleline": "never",
-    //     "multiline": {
-    //         "objects": "always",    
-    //         "arrays": "always",
-    //         "functions": "never",
-    //         "typeLiterals": "ignore"
-    //     }
-    // }]    
+    "rules": {
+        "linebreak-style": 0, // Ignoring linebreaks for cross OS development
+        "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
+        "react/prefer-stateless-function": 0,
+        "object-shorthand": 0,
+        "quotes": 0,
+        "no-use-before-define": 0,
+        "jsx-a11y/anchor-is-valid": 0,
+        "jsx-a11y/anchor-has-content": 0, //TODO remove this later
+        "react/self-closing-comp": 0,
+        "class-methods-use-this": 0,
+        "no-console": 0,
+        "react/jsx-one-expression-per-line": 0,
+        "no-param-reassign": 0,
+        "import/no-unresolved": [ "error", { "ignore": [ "common", "utils", "assets", "ui", "layout", "styles" ] } ],
+        "import/extensions": [ "error", { "ignore": [ "utils", "assets", "layout" ], "png": "always", "svg": "always", "css": "always" }],
+        "react/sort-comp": 0,
+        "react/forbid-prop-types": 0, //TODO fix this
+        // "quote-props": 0,
+        "jsx-a11y/label-has-for": 0, //TODO remove this after css fix
+        "jsx-a11y/aria-proptypes": 0,
+        "jsx-a11y/label-has-associated-control": 0,
+        "no-unused-expressions": [2, { "allowShortCircuit": true, "allowTernary": true }]
+        }
 }

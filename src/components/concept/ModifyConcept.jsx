@@ -19,19 +19,16 @@ class ModifyConcept extends React.Component {
       retireReason: '',
       retired: false,
     };
+
     this.state = {
       concept: initialConceptState,
       redirect: null,
+      conceptId: props.match.params.id,
     };
-
-    const { match } = this.props;
-    const { params } = match;
-    const { id } = params;
-    this.conceptId = id;
   }
 
   componentDidMount() {
-    const { conceptId } = this;
+    const { conceptId } = this.state;
     if (conceptId !== 'add') {
       getConceptById(conceptId)
         .then((response) => {
@@ -50,8 +47,7 @@ class ModifyConcept extends React.Component {
 
   unretire(event) {
     event.preventDefault();
-    const { conceptId } = this;
-    const { concept } = this.state;
+    const { concept, conceptId } = this.state;
     concept.retired = false;
     this.setState({ concept }, () => {
       putConceptById(conceptId, concept)
@@ -74,8 +70,7 @@ class ModifyConcept extends React.Component {
 
   saveConcept(event) {
     event.preventDefault();
-    const { conceptId } = this;
-    const { concept } = this.state;
+    const { concept, conceptId } = this.state;
     if (conceptId === 'add') {
       postConcept(concept)
         .then(() => {
@@ -91,12 +86,9 @@ class ModifyConcept extends React.Component {
     }
   }
 
-// conceptId -> TODO
-
   saveConceptAndContinue(event) {
     event.preventDefault();
-    const { conceptId } = this;
-    const { concept } = this.state;
+    const { concept, conceptId } = this.state;
     if (conceptId === 'add') {
       postConcept(concept)
         .then((response) => {
@@ -117,7 +109,7 @@ class ModifyConcept extends React.Component {
 
   deleteConcept(event) {
     event.preventDefault();
-    const { conceptId } = this;
+    const { conceptId } = this.state;
     deleteConceptById(conceptId)
       .then(() => {
         this.setState({ redirect: '/concept' });
@@ -133,8 +125,7 @@ class ModifyConcept extends React.Component {
 
   retireConcept(event) {
     event.preventDefault();
-    const { conceptId } = this;
-    const { concept } = this.state;
+    const { concept, conceptId } = this.state;
     concept.retired = true;
     this.setState({ concept }, () => {
       putConceptById(conceptId, concept)
@@ -154,10 +145,9 @@ class ModifyConcept extends React.Component {
       deleteConcept,
       retireReasonChangeHandler,
       retireConcept,
-      conceptId,
     } = this;
 
-    const { concept, redirect } = this.state;
+    const { concept, redirect, conceptId } = this.state;
 
     if (redirect) {
       return <Redirect to={redirect} />;
@@ -178,25 +168,29 @@ class ModifyConcept extends React.Component {
         )}
 
         <form>
-          <label htmlFor="shortName">Short Name: </label>
-          <input
-            type="text"
-            id="shortName"
-            name="shortName"
-            onChange={shortNameChangeHandler.bind(this)}
-            value={concept.shortName}
-          />
-          <br />
+          <label htmlFor="shortName">
+            Short Name:
+            <input
+              type="text"
+              id="shortName"
+              name="shortName"
+              onChange={shortNameChangeHandler.bind(this)}
+              value={concept.shortName}
+            />
+            <br />
+          </label>
 
-          <label htmlFor="description">Description: </label>
-          <input
-            type="text"
-            id="description"
-            name="description"
-            onChange={descriptionChangeHandler.bind(this)}
-            value={concept.description}
-          />
-          <br />
+          <label htmlFor="description">
+            Description:
+            <input
+              type="text"
+              id="description"
+              name="description"
+              onChange={descriptionChangeHandler.bind(this)}
+              value={concept.description}
+            />
+            <br />
+          </label>
 
           <button type="button" onClick={saveConcept.bind(this)}>
             Save Concept
@@ -218,15 +212,17 @@ class ModifyConcept extends React.Component {
           <div>
             <hr />
             <p>Retire Concept</p>
-            <label htmlFor="retireReason">Reason: </label>
-            <input
-              type="text"
-              id="retireReason"
-              name="retireReason"
-              onChange={retireReasonChangeHandler.bind(this)}
-              value={concept.retireReason}
-            />
-            <br />
+            <label htmlFor="retireReason">
+              Reason:
+              <input
+                type="text"
+                id="retireReason"
+                name="retireReason"
+                onChange={retireReasonChangeHandler.bind(this)}
+                value={concept.retireReason}
+              />
+              <br />
+            </label>
 
             <button type="button" onClick={retireConcept.bind(this)}>
               Retire

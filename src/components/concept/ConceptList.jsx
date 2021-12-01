@@ -1,6 +1,7 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { getConcepts } from "../../api/services";
+/* eslint-disable no-console */
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { getConcepts } from '../../api/services';
 
 class ConceptList extends React.Component {
   constructor(props) {
@@ -14,13 +15,12 @@ class ConceptList extends React.Component {
     getConcepts()
       .then((response) => {
         const loadedConcepts = [];
-
-        for (const key in response.data) {
+        Object.keys(response.data).forEach((key) => {
           loadedConcepts.push({
             conceptId: key,
             shortName: response.data[key].shortName,
           });
-        }
+        });
 
         this.setState({ concepts: loadedConcepts });
       })
@@ -30,20 +30,17 @@ class ConceptList extends React.Component {
   }
 
   render() {
+    const { concepts } = this.state;
     return (
-      <React.Fragment>
-        <ul>
-          {this.state.concepts.map((concept) => {
-            return (
-              <li key={concept.conceptId}>
-                <Link to={`/concept/${concept.conceptId}`}>
-                  {concept.shortName}
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-      </React.Fragment>
+      <ul>
+        {concepts.map((concept) => (
+          <li key={concept.conceptId}>
+            <Link to={`/concept/${concept.conceptId}`}>
+              {concept.shortName}
+            </Link>
+          </li>
+        ))}
+      </ul>
     );
   }
 }

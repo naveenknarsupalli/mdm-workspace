@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/label-has-associated-control */
 /* eslint-disable no-console */
 import React from 'react';
 import { withRouter, Redirect } from 'react-router-dom';
@@ -7,7 +8,7 @@ import Select from 'react-select';
 import {
   deleteDrugById,
   getConcepts,
-  getDrugById,
+  // getDrugById,
   postDrug,
   putDrugById,
 } from '../../api/services';
@@ -38,40 +39,42 @@ class ModifyDrug extends React.Component {
 
     this.conceptIdChangeHandler = this.conceptIdChangeHandler.bind(this);
     this.dosageFormChangeHandler = this.dosageFormChangeHandler.bind(this);
-    this.filterOptions = this.filterOptions.bind(this);
+    // this.filterOptions = this.filterOptions.bind(this);
   }
 
   componentDidMount() {
-    const { drugId, options, drug } = this.state;
+    // const { drugId, options, drug } = this.state;
     getConcepts()
       .then((response) => {
-        const loadedOptions = [];
+        const options = [];
 
         Object.keys(response.data).forEach((key) => {
-          loadedOptions.push({
+          options.push({
             value: key,
             label: response.data[key].shortName,
           });
         });
 
-        this.setState({ options: loadedOptions }, () => {
-          if (drugId !== 'add') {
-            getDrugById(drugId)
-              .then((resp) => {
-                this.setState({ drug: resp.data }, () => {
-                  const filtered = options.filter(
-                    (option) => option.value === drug.conceptId,
-                  );
-                  this.setState({ defaultConceptIdValue: filtered }, () => {
-                    this.setState({ startRender: true });
-                  });
-                });
-              })
-              .catch((error) => {
-                console.log(error);
-              });
-          }
-        });
+        this.setState({ options });
+        //   , () => {
+        //   if (drugId !== 'add') {
+        //     getDrugById(drugId)
+        //       .then((resp) => {
+        //         this.setState({ drug: resp.data }, () => {
+        //           const filtered = options.filter(
+        //             (option) => option.value === drug.conceptId,
+        //           );
+        //           this.setState({ defaultConceptIdValue: filtered }, () => {
+        //             this.setState({ startRender: true });
+        //           });
+        //         });
+        //       })
+        //       .catch((error) => {
+        //         console.log(error);
+        //       });
+        //   }
+        // }
+        // );
       })
       .catch((error) => {
         console.log(error);
@@ -102,14 +105,6 @@ class ModifyDrug extends React.Component {
     const { drug } = this.state;
     drug.conceptId = selectedOption.value;
     this.setState({ drug });
-  }
-
-  filterOptions(option, inputValue) {
-    const { label, value } = option;
-    return (
-      label.toLowerCase().includes(inputValue.toLowerCase())
-      || value.toLowerCase().includes(inputValue.toLowerCase())
-    );
   }
 
   combinationChangeHandler(event) {
@@ -202,9 +197,9 @@ class ModifyDrug extends React.Component {
     const {
       nameChangeHandler,
       conceptIdChangeHandler,
-      filterOptions,
       combinationChangeHandler,
       dosageFormChangeHandler,
+      // filterOptions,
       strengthChangeHandler,
       minimumDailyDoseChangeHandler,
       maximumDailyDoseChangeHandler,
@@ -222,6 +217,16 @@ class ModifyDrug extends React.Component {
     const {
       drug, redirect, drugId, options, startRender,
     } = this.state;
+
+    const filterOptions = (option, inputValue) => {
+      // const { that } = this;
+      const { label, value } = option;
+      console.log(this);
+      return (
+        label.toLowerCase().includes(inputValue.toLowerCase())
+        || value.toLowerCase().includes(inputValue.toLowerCase())
+      );
+    };
 
     const getDefaultConceptIdValue = options.filter(
       (option) => option.value === drug.conceptId,
@@ -294,8 +299,8 @@ class ModifyDrug extends React.Component {
             </label>
 
             <label htmlFor="dosageForm">
-              Dosage Form:
               <div style={{ width: '300px', display: 'inline-block' }}>
+                Dosage Form:
                 <Select
                   id="dosageForm"
                   name="dosageForm"
@@ -305,8 +310,8 @@ class ModifyDrug extends React.Component {
                   options={options}
                   filterOption={filterOptions}
                 />
+                <br />
               </div>
-              <br />
             </label>
 
             <label htmlFor="strength">

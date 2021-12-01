@@ -15,46 +15,49 @@ import RelationshipPage from './pages/RelationshipPage';
 import ModifyPrivilege from './components/privilege/ModifyPrivilege';
 import PrivilegePage from './pages/PrivilegePage';
 
-const App = () => {
-  <>
-    <NavBar />
-    <Switch>
-      <Route path="/concept/:id">
-        <ModifyConcept />
-      </Route>
-      <Route path="/concept">
-        <ConceptPage />
-      </Route>
+// eslint-disable-next-line
+const App = function () {
+  return (
+    <>
+      <NavBar />
+      <Switch>
+        <Route path="/concept/:id">
+          <ModifyConcept />
+        </Route>
+        <Route path="/concept">
+          <ConceptPage />
+        </Route>
 
-      <Route path="/conceptClass/:id">
-        <ModifyConceptClass />
-      </Route>
-      <Route path="/conceptClass">
-        <ConceptClassPage />
-      </Route>
+        <Route path="/conceptClass/:id">
+          <ModifyConceptClass />
+        </Route>
+        <Route path="/conceptClass">
+          <ConceptClassPage />
+        </Route>
 
-      <Route path="/drug/:id">
-        <ModifyDrug />
-      </Route>
-      <Route path="/drug">
-        <DrugPage />
-      </Route>
+        <Route path="/drug/:id">
+          <ModifyDrug />
+        </Route>
+        <Route path="/drug">
+          <DrugPage />
+        </Route>
 
-      <Route path="/relationship/:id">
-        <ModifyRealationship />
-      </Route>
-      <Route path="/relationship">
-        <RelationshipPage />
-      </Route>
+        <Route path="/relationship/:id">
+          <ModifyRealationship />
+        </Route>
+        <Route path="/relationship">
+          <RelationshipPage />
+        </Route>
 
-      <Route path="/privilege/:id">
-        <ModifyPrivilege />
-      </Route>
-      <Route path="/privilege">
-        <PrivilegePage />
-      </Route>
-    </Switch>
-  </>;
+        <Route path="/privilege/:id">
+          <ModifyPrivilege />
+        </Route>
+        <Route path="/privilege">
+          <PrivilegePage />
+        </Route>
+      </Switch>
+    </>
+  );
 };
 
 export default App;

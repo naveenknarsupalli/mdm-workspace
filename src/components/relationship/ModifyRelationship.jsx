@@ -21,7 +21,6 @@ class ModifyRealationship extends React.Component {
       retired: false,
     };
 
-    // const { id } = props.match.params;
     this.state = {
       relationship: initialRelationshipState,
       relationshipId: props.match.params.id,

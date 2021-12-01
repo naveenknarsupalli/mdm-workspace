@@ -43,16 +43,23 @@ class DrugList extends React.Component {
 
   componentDidUpdate(prevProps, prevState) {
     const { showRetired, drugs } = this.state;
+    const { setFilteredDrugsOnRetired } = this;
     if (prevState.showRetired !== showRetired) {
       if (showRetired) {
-        this.setState({ filteredDrugsOnRetired: drugs });
+        setFilteredDrugsOnRetired(drugs);
+        // this.setState({ filteredDrugsOnRetired: drugs });
       } else {
         const filteredDrugsOnRetired = drugs.filter(
           (drug) => drug.retired === false
         );
-        this.setState({ filteredDrugsOnRetired });
+        setFilteredDrugsOnRetired(filteredDrugsOnRetired);
+        // this.setState({ filteredDrugsOnRetired });
       }
     }
+  }
+
+  setFilteredDrugsOnRetired(drugs) {
+    this.setState({ filteredDrugsOnRetired: drugs });
   }
 
   toggleRetired() {
