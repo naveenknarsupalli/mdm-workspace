@@ -1,19 +1,19 @@
-import React, { Fragment } from "react";
-import { Redirect, withRouter } from "react-router-dom";
+import React, { Fragment } from 'react';
+import { Redirect, withRouter } from 'react-router-dom';
 import {
   deleteConceptById,
   getConceptById,
   postConcept,
   putConceptById,
-} from "../../api/services";
+} from '../../api/services';
 
 class ModifyConcept extends React.Component {
   constructor(props) {
     super(props);
     const initialConceptState = {
-      shortName: "",
-      description: "",
-      retireReason: "",
+      shortName: '',
+      description: '',
+      retireReason: '',
       retired: false,
     };
     this.state = {
@@ -25,7 +25,7 @@ class ModifyConcept extends React.Component {
 
   componentDidMount() {
     const { conceptId } = this.state;
-    if (conceptId !== "add") {
+    if (conceptId !== 'add') {
       getConceptById(conceptId)
         .then((response) => {
           this.setState({
@@ -68,16 +68,16 @@ class ModifyConcept extends React.Component {
     event.preventDefault();
 
     const { conceptId, concept } = this.state;
-    if (conceptId === "add") {
+    if (conceptId === 'add') {
       postConcept(concept)
         .then(() => {
-          this.setState({ redirect: "/concept" });
+          this.setState({ redirect: '/concept' });
         })
         .catch((error) => console.log(error));
     } else {
       putConceptById(conceptId, concept)
         .then(() => {
-          this.setState({ redirect: "/concept" });
+          this.setState({ redirect: '/concept' });
         })
         .catch((error) => console.log(error));
     }
@@ -87,7 +87,7 @@ class ModifyConcept extends React.Component {
     event.preventDefault();
 
     const { conceptId, concept } = this.state;
-    if (conceptId === "add") {
+    if (conceptId === 'add') {
       postConcept(concept)
         .then((response) => {
           this.setState({ conceptId: response.data.name });
@@ -102,7 +102,7 @@ class ModifyConcept extends React.Component {
 
   cancelConcept(event) {
     event.preventDefault();
-    this.setState({ redirect: "/concept" });
+    this.setState({ redirect: '/concept' });
   }
 
   deleteConcept(event) {
@@ -110,7 +110,7 @@ class ModifyConcept extends React.Component {
     const { conceptId } = this.state;
     deleteConceptById(conceptId)
       .then(() => {
-        this.setState({ redirect: "/concept" });
+        this.setState({ redirect: '/concept' });
       })
       .catch((error) => console.log(error));
   }
@@ -153,7 +153,7 @@ class ModifyConcept extends React.Component {
 
     return (
       <Fragment>
-        {conceptId !== "add" && concept.retired && (
+        {conceptId !== 'add' && concept.retired && (
           <div>
             <p>
               This concept is retired by (user) (retiredDate) - Retired from
@@ -195,14 +195,14 @@ class ModifyConcept extends React.Component {
           <button type="button" onClick={cancelConcept.bind(this)}>
             Cancel
           </button>
-          {conceptId !== "add" && (
+          {conceptId !== 'add' && (
             <button type="button" onClick={deleteConcept.bind(this)}>
               Delete
             </button>
           )}
         </form>
 
-        {conceptId !== "add" && !concept.retired && (
+        {conceptId !== 'add' && !concept.retired && (
           <div>
             <hr />
             <p>Retire Concept</p>
