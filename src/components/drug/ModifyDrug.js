@@ -1,28 +1,28 @@
-import React from "react";
-import { withRouter, Redirect } from "react-router-dom";
-import Select from "react-select";
+import React from 'react';
+import { withRouter, Redirect } from 'react-router-dom';
+import Select from 'react-select';
 import {
   deleteDrugById,
   getConcepts,
   getDrugById,
   postDrug,
   putDrugById,
-} from "../../api/services";
+} from '../../api/services';
 
 class ModifyDrug extends React.Component {
   constructor(props) {
     super(props);
 
     const initialDrugState = {
-      name: "",
-      conceptId: "",
+      name: '',
+      conceptId: '',
       combination: false,
-      dosageForm: "",
-      strength: "",
-      minimumDailyDose: "",
-      maximumDailyDose: "",
+      dosageForm: '',
+      strength: '',
+      minimumDailyDose: '',
+      maximumDailyDose: '',
       retired: false,
-      retireReason: "",
+      retireReason: '',
     };
 
     this.state = {
@@ -32,7 +32,7 @@ class ModifyDrug extends React.Component {
       options: [],
       defaultConceptIdValue: {},
       defaultDosageFormValue: {},
-      startRender: false,
+      isLoading: true,
     };
   }
 
@@ -48,17 +48,20 @@ class ModifyDrug extends React.Component {
           });
         }
         this.setState({ options: loadedOptions }, () => {
-          if (drugId !== "add") {
+          if (drugId !== 'add') {
             getDrugById(drugId)
               .then((response) => {
-                this.setState({ drug: response.data }, () => {
-                  const filtered = this.state.options.filter(
-                    (option) => option.value === this.state.drug.conceptId
-                  );
-                  this.setState({ defaultConceptIdValue: filtered }, () => {
-                    this.setState({ startRender: true });
-                  });
-                });
+                this.setState(
+                  { drug: response.data, isLoading: false }
+                  //   , () => {
+                  //   const filtered = this.state.options.filter(
+                  //     (option) => option.value === this.state.drug.conceptId
+                  //   );
+                  //   this.setState({ defaultConceptIdValue: filtered }, () => {
+                  //     this.setState({ isLoading: true });
+                  //   });
+                  // }
+                );
               })
               .catch((error) => {
                 console.log(error);
@@ -77,7 +80,7 @@ class ModifyDrug extends React.Component {
     this.setState({ drug: drug }, () => {
       putDrugById(drugId, drug)
         .then(() => {
-          this.setState({ redirect: "/drug" });
+          this.setState({ redirect: '/drug' });
         })
         .catch((error) => {
           console.log(error);
@@ -143,10 +146,10 @@ class ModifyDrug extends React.Component {
 
   submitDrugFormHandler() {
     const { drug, drugId } = this.state;
-    if (drugId === "add") {
+    if (drugId === 'add') {
       postDrug(drug)
         .then(() => {
-          this.setState({ redirect: "/drug" });
+          this.setState({ redirect: '/drug' });
         })
         .catch((error) => {
           console.log(error);
@@ -154,7 +157,7 @@ class ModifyDrug extends React.Component {
     } else {
       putDrugById(drugId, drug)
         .then(() => {
-          this.setState({ redirect: "/drug" });
+          this.setState({ redirect: '/drug' });
         })
         .catch((error) => {
           console.log(error);
@@ -163,7 +166,7 @@ class ModifyDrug extends React.Component {
   }
 
   cancelButtonHandler() {
-    this.setState({ redirect: "/drug" });
+    this.setState({ redirect: '/drug' });
   }
 
   retireDrug() {
@@ -176,7 +179,7 @@ class ModifyDrug extends React.Component {
           console.log(error);
         });
 
-      this.setState({ redirect: "/drug" });
+      this.setState({ redirect: '/drug' });
     });
   }
 
@@ -184,7 +187,7 @@ class ModifyDrug extends React.Component {
     let { drugId } = this.state;
     deleteDrugById(drugId)
       .then(() => {
-        this.setState({ redirect: "/drug" });
+        this.setState({ redirect: '/drug' });
       })
       .catch((error) => {
         console.log(error);
@@ -212,7 +215,7 @@ class ModifyDrug extends React.Component {
       deleteDrug,
     } = this;
 
-    const { drug, redirect, drugId, options, startRender } = this.state;
+    const { drug, redirect, drugId, options, isLoading } = this.state;
 
     const getDefaultConceptIdValue = options.filter(
       (option) => option.value === drug.conceptId
@@ -222,17 +225,19 @@ class ModifyDrug extends React.Component {
       (option) => option.value === drug.dosageForm
     );
 
+    console.log(getDefaultConceptIdValue, 'getDefaultConceptIdValue');
+
     if (redirect) {
       return <Redirect to={redirect} />;
     }
 
-    if (startRender || drugId === "add") {
+    if (!isLoading || drugId === 'add') {
       return (
         <React.Fragment>
           <p>Concept Drug Management</p>
           {drug.retired && (
             <p>
-              This drug is retired by ... ... - {drug.retireReason}{" "}
+              This drug is retired by ... ... - {drug.retireReason}{' '}
               <button type="button" onClick={unretireDrug.bind(this)}>
                 Unretire this drug
               </button>
@@ -252,7 +257,7 @@ class ModifyDrug extends React.Component {
             <br />
 
             <label htmlFor="conceptId">Concept*: </label>
-            <div style={{ width: "300px", display: "inline-block" }}>
+            <div style={{ width: '300px', display: 'inline-block' }}>
               <Select
                 id="conceptId"
                 name="conceptId"
@@ -276,7 +281,7 @@ class ModifyDrug extends React.Component {
             <br />
 
             <label htmlFor="dosageForm">Dosage Form: </label>
-            <div style={{ width: "300px", display: "inline-block" }}>
+            <div style={{ width: '300px', display: 'inline-block' }}>
               <Select
                 id="dosageForm"
                 name="dosageForm"
@@ -330,7 +335,7 @@ class ModifyDrug extends React.Component {
           </form>
           <hr />
 
-          {drugId !== "add" && (
+          {drugId !== 'add' && (
             <div>
               <p>Retire this Drug</p>
               <label htmlFor="retireReason">Reason: </label>

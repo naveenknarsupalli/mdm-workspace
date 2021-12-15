@@ -1,6 +1,6 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { getConcepts } from "../../api/services";
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { getConcepts } from '../../api/services';
 
 class ConceptList extends React.Component {
   constructor(props) {
@@ -11,6 +11,10 @@ class ConceptList extends React.Component {
   }
 
   componentDidMount() {
+    this.loadAllConcepts();
+  }
+
+  loadAllConcepts() {
     getConcepts()
       .then((response) => {
         const loadedConcepts = [];

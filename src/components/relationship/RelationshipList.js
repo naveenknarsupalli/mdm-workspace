@@ -1,6 +1,6 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { getRelationships } from "../../api/services";
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { getRelationships } from '../../api/services';
 
 class RelationshipList extends React.Component {
   constructor(props) {
@@ -13,13 +13,7 @@ class RelationshipList extends React.Component {
   componentDidMount() {
     getRelationships()
       .then((response) => {
-        const loadedRelationships = [];
-        for (const key in response.data) {
-          let relationship = response.data[key];
-          relationship["relationshipId"] = key;
-          loadedRelationships.push(relationship);
-        }
-        this.setState({ relationships: loadedRelationships });
+        this.setState({ relationships: response.data });
       })
       .catch((error) => {
         console.log(error);
@@ -36,18 +30,21 @@ class RelationshipList extends React.Component {
       <React.Fragment>
         <table>
           <thead>
-            <th>Current Relationship Types</th>
+            <tr>
+              <th>Current Relationship Types</th>
+            </tr>
           </thead>
+
           <tbody>
             <tr>
               <td>Names</td>
               <td>Description</td>
             </tr>
             {relationships.map((relationship) => (
-              <tr key={relationship.relationshipId}>
+              <tr key={relationship.uuid}>
                 <td>
-                  <Link to={`/relationship/${relationship.relationshipId}`}>
-                    {relationship.aIsToB}/{relationship.bIsToA}
+                  <Link to={`/relationship/${relationship.uuid}`}>
+                    {relationship.aisToB}/{relationship.bisToA}
                   </Link>
                 </td>
                 <td>{relationship.description}</td>

@@ -1,7 +1,7 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import Pagination from "../../utils/Pagination";
-import { getConcepts } from "../../api/services";
+import React from 'react';
+import { Link } from 'react-router-dom';
+import Pagination from '../../utils/Pagination';
+import { getConcepts } from '../../api/services';
 
 class FindConcept extends React.Component {
   constructor(props) {
@@ -9,7 +9,7 @@ class FindConcept extends React.Component {
     this.state = {
       concepts: [],
       filteredConceptsByRetired: [],
-      searchText: "",
+      searchText: '',
       showRetired: false,
       showDetails: false,
       currentPage: 1,
@@ -18,6 +18,10 @@ class FindConcept extends React.Component {
   }
 
   componentDidMount() {
+    this.loadAllConcepts();
+  }
+
+  loadAllConcepts() {
     getConcepts()
       .then((response) => {
         const loadedConcepts = [];
@@ -86,6 +90,7 @@ class FindConcept extends React.Component {
       paginate,
       conceptsPerPageChangeHandler,
     } = this;
+
     const {
       filteredConceptsByRetired,
       searchText,
@@ -123,7 +128,7 @@ class FindConcept extends React.Component {
               <td>
                 <label htmlFor="searchText">
                   Find a concept by typing in its name or Id:
-                </label>{" "}
+                </label>{' '}
                 <input
                   type="text"
                   id="searchText"
@@ -131,7 +136,7 @@ class FindConcept extends React.Component {
                   value={searchText}
                   onChange={handleSearchTextChange.bind(this)}
                 />
-                <button type="button">Search</button>{" "}
+                <button type="button">Search</button>{' '}
                 <input
                   type="checkbox"
                   id="showRetired"
@@ -139,7 +144,7 @@ class FindConcept extends React.Component {
                   value={showRetired}
                   onChange={handleShowRetired.bind(this)}
                 />
-                <label htmlFor="showRetired">Include Retired</label>{" "}
+                <label htmlFor="showRetired">Include Retired</label>{' '}
                 <input
                   type="checkbox"
                   id="showDetails"
@@ -172,10 +177,10 @@ class FindConcept extends React.Component {
                 {searchText && (
                   <div className="container">
                     <span>
-                      Showing {indexOfFirstConcept + 1} to{" "}
+                      Showing {indexOfFirstConcept + 1} to{' '}
                       {indexOfLastConcept > filteredConcepts.length
                         ? filteredConcepts.length
-                        : indexOfLastConcept}{" "}
+                        : indexOfLastConcept}{' '}
                       of {filteredConcepts.length} entries
                     </span>
                     <Pagination
