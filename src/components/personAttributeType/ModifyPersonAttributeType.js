@@ -28,14 +28,12 @@ class ModifyPersonAttributeType extends React.Component {
       personAttributeType: initialPersonAttributeType,
       personAttributeTypeId: this.props.match.params.id,
       redirect: null,
-      formatOptions: [],
       isLoading: true,
     };
   }
 
   componentDidMount() {
     const { personAttributeTypeId } = this.state;
-    this.setState({ formatOptions: FORMATS });
     if (personAttributeTypeId !== 'add') {
       getPersonAttributeTypeById(personAttributeTypeId)
         .then((response) => {
@@ -55,7 +53,6 @@ class ModifyPersonAttributeType extends React.Component {
     personAttributeType.name = event.target.value;
     this.setState({ personAttributeType });
   }
-  // [`${personAttributeType}`]
 
   descriptionChangeHandler(event) {
     const { personAttributeType } = this.state;
@@ -65,42 +62,52 @@ class ModifyPersonAttributeType extends React.Component {
 
   savePersonAttributeType() {
     const { personAttributeTypeId, personAttributeType } = this.state;
-    if (personAttributeTypeId === 'add') {
-      createPersonAttributeType(personAttributeType)
-        .then(() => {
-          this.setState({ redirect: '/personAttributeType' });
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    } else {
-      updatePersonAttributeTypeById(personAttributeTypeId, personAttributeType)
-        .then(() => {
-          this.setState({ redirect: '/personAttributeType' });
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    }
+    if (personAttributeTypeId === 'add')
+      this.createPersonAttributeTypeWithData(personAttributeType);
+    else
+      this.updatePersonAttributeTypeWithData(
+        personAttributeTypeId,
+        personAttributeType
+      );
+  }
+
+  createPersonAttributeTypeWithData(personAttributeType) {
+    createPersonAttributeType(personAttributeType)
+      .then(() => {
+        this.setState({ redirect: '/personAttributeType' });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
+  updatePersonAttributeTypeWithData(
+    personAttributeTypeId,
+    personAttributeType
+  ) {
+    updatePersonAttributeTypeById(personAttributeTypeId, personAttributeType)
+      .then(() => {
+        this.setState({ redirect: '/personAttributeType' });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   }
 
   retireReasonChangeHandler(event) {
     const { personAttributeType } = this.state;
     personAttributeType.retireReason = event.target.value;
-    this.setState({ personAttributeType: personAttributeType });
+    this.setState({ personAttributeType });
   }
 
   retirePersonAttributeType() {
     const { personAttributeTypeId, personAttributeType } = this.state;
     personAttributeType.retired = true;
-    this.setState({ personAttributeType: personAttributeType }, () => {
-      updatePersonAttributeTypeById(personAttributeTypeId, personAttributeType)
-        .then(() => {
-          this.setState({ redirect: '/personAttributeType' });
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+    this.setState({ personAttributeType }, () => {
+      this.updatePersonAttributeTypeWithData(
+        personAttributeTypeId,
+        personAttributeType
+      );
     });
   }
 
@@ -108,14 +115,11 @@ class ModifyPersonAttributeType extends React.Component {
     const { personAttributeTypeId, personAttributeType } = this.state;
     personAttributeType.retireReason = '';
     personAttributeType.retired = false;
-    this.setState({ personAttributeType: personAttributeType }, () => {
-      updatePersonAttributeTypeById(personAttributeTypeId, personAttributeType)
-        .then(() => {
-          this.setState({ redirect: '/personAttributeType' });
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+    this.setState({ personAttributeType }, () => {
+      this.updatePersonAttributeTypeWithData(
+        personAttributeTypeId,
+        personAttributeType
+      );
     });
   }
 
@@ -142,14 +146,13 @@ class ModifyPersonAttributeType extends React.Component {
     this.setState({ personAttributeType });
   }
 
+  getValueFor(field) {
+    return field === null ? '' : field;
+  }
+
   render() {
-    const {
-      personAttributeType,
-      personAttributeTypeId,
-      formatOptions,
-      redirect,
-      isLoading,
-    } = this.state;
+    const { personAttributeType, personAttributeTypeId, redirect, isLoading } =
+      this.state;
 
     const {
       nameChangeHandler,
@@ -161,11 +164,12 @@ class ModifyPersonAttributeType extends React.Component {
       deletePersonAttributeType,
       formatChangeHandler,
       searchableChangeHandler,
+      getValueFor,
     } = this;
 
     if (redirect) return <Redirect to={redirect} />;
 
-    const getDefaultFormatValue = formatOptions.filter(
+    const getDefaultFormatValue = FORMATS.filter(
       (option) => option.value === personAttributeType.format
     );
 
@@ -173,47 +177,55 @@ class ModifyPersonAttributeType extends React.Component {
       return (
         <React.Fragment>
           <div>
-            <label htmlFor="name">Name: </label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              value={personAttributeType.name}
-              onChange={nameChangeHandler.bind(this)}
-            />
-            <br />
-
-            <label htmlFor="format">Format: </label>
-            <div style={{ width: '300px', display: 'inline-block' }}>
-              <Select
-                id="format"
-                name="format"
-                defaultValue={getDefaultFormatValue}
-                onChange={formatChangeHandler.bind(this)}
-                options={formatOptions}
+            <label htmlFor="name">
+              Name:
+              <input
+                type="text"
+                id="name"
+                name="name"
+                value={getValueFor(personAttributeType.name)}
+                onChange={nameChangeHandler.bind(this)}
               />
-            </div>
+            </label>
             <br />
 
-            <label htmlFor="searchable">Searchable: </label>
-            <input
-              type="checkbox"
-              id="searchable"
-              name="searchable"
-              onChange={searchableChangeHandler.bind(this)}
-              value={personAttributeType.searchable}
-            />
+            <label htmlFor="format">
+              Format:
+              <div style={{ width: '300px', display: 'inline-block' }}>
+                <Select
+                  id="format"
+                  name="format"
+                  defaultValue={getDefaultFormatValue}
+                  onChange={formatChangeHandler.bind(this)}
+                  options={FORMATS}
+                />
+              </div>
+            </label>
             <br />
 
-            <label htmlFor="description">Description: </label>
-            <textarea
-              id="description"
-              name="description"
-              rows="3"
-              cols="20"
-              value={personAttributeType.description}
-              onChange={descriptionChangeHandler.bind(this)}
-            />
+            <label htmlFor="searchable">
+              Searchable:
+              <input
+                type="checkbox"
+                id="searchable"
+                name="searchable"
+                onChange={searchableChangeHandler.bind(this)}
+                checked={getValueFor(personAttributeType.searchable)}
+              />
+            </label>
+            <br />
+
+            <label htmlFor="description">
+              Description:
+              <textarea
+                id="description"
+                name="description"
+                rows="3"
+                cols="20"
+                value={getValueFor(personAttributeType.description)}
+                onChange={descriptionChangeHandler.bind(this)}
+              />
+            </label>
             <br />
 
             {/* SELECT -- Edit Privilege */}
@@ -227,15 +239,19 @@ class ModifyPersonAttributeType extends React.Component {
           {personAttributeTypeId !== 'add' && !personAttributeType.retired && (
             <div>
               <hr />
+
               <p>Retire Person Attribute Type</p>
-              <label htmlFor="retireReason">Reason: </label>
-              <input
-                type="text"
-                id="retireReason"
-                name="retireReason"
-                value={personAttributeType.retireReason}
-                onChange={retireReasonChangeHandler.bind(this)}
-              />
+
+              <label htmlFor="retireReason">
+                Reason:
+                <input
+                  type="text"
+                  id="retireReason"
+                  name="retireReason"
+                  value={getValueFor(personAttributeType.retireReason)}
+                  onChange={retireReasonChangeHandler.bind(this)}
+                />
+              </label>
               <br />
 
               <button
@@ -269,6 +285,7 @@ class ModifyPersonAttributeType extends React.Component {
               <hr />
 
               <p>Delete Person Attribute Type Forever</p>
+
               <button
                 type="button"
                 onClick={deletePersonAttributeType.bind(this)}
