@@ -1,13 +1,14 @@
-import React from 'react';
-import { withRouter, Redirect } from 'react-router-dom';
-import Select from 'react-select';
-import FORMATS from '../../constants/formats';
+import { Redirect, withRouter } from 'react-router-dom';
 import {
+  createPersonAttributeType,
   deletePersonAttributeTypeById,
   getPersonAttributeTypeById,
-  createPersonAttributeType,
   updatePersonAttributeTypeById,
 } from '../../api/services';
+
+import FORMATS from '../../constants/formats';
+import React from 'react';
+import Select from 'react-select';
 
 class ModifyPersonAttributeType extends React.Component {
   constructor(props) {

@@ -1,6 +1,6 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 import PersonAttributeTypeList from '../components/personAttributeType/PersonAttributeTypeList';
+import React from 'react';
 
 function PersonAttributeTypePage() {
   return (

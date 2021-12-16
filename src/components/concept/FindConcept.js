@@ -1,6 +1,6 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 import Pagination from '../../utils/Pagination';
+import React from 'react';
 import { getConcepts } from '../../api/services';
 
 class FindConcept extends React.Component {

@@ -1,6 +1,6 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { getDrugs } from "../../api/services";
+import { Link } from 'react-router-dom';
+import React from 'react';
+import { getDrugs } from '../../api/services';
 
 class DrugList extends React.Component {
   constructor(props) {

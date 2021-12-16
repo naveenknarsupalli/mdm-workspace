@@ -1,6 +1,4 @@
-import React from 'react';
-import { withRouter, Redirect } from 'react-router-dom';
-import Select from 'react-select';
+import { Redirect, withRouter } from 'react-router-dom';
 import {
   deleteDrugById,
   getConcepts,
@@ -8,6 +6,9 @@ import {
   postDrug,
   putDrugById,
 } from '../../api/services';
+
+import React from 'react';
+import Select from 'react-select';
 
 class ModifyDrug extends React.Component {
   constructor(props) {

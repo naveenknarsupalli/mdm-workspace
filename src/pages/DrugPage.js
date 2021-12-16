@@ -1,6 +1,6 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import DrugList from "../components/drug/DrugList";
+import DrugList from '../components/drug/DrugList';
+import { Link } from 'react-router-dom';
+import React from 'react';
 
 function DrugPage() {
   return (

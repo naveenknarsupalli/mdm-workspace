@@ -1,5 +1,5 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
+import React from 'react';
 import { getPersonAttributeTypes } from '../../api/services';
 
 class PersonAttributeTypeList extends React.Component {

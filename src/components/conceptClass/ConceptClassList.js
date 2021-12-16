@@ -1,6 +1,6 @@
-import React, { Fragment } from "react";
-import { Link, Redirect } from "react-router-dom";
-import { deleteConceptById, getConceptClasses } from "../../api/services";
+import { Link, Redirect } from 'react-router-dom';
+import React, { Fragment } from 'react';
+import { deleteConceptById, getConceptClasses } from '../../api/services';
 
 class ConceptClassList extends React.Component {
   constructor(props) {

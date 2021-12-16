@@ -1,17 +1,18 @@
-import React from "react";
-import { withRouter, Redirect } from "react-router-dom";
+import { Redirect, withRouter } from 'react-router-dom';
 import {
   getPrivilegeById,
   postPrivilege,
   putPrivilegeById,
-} from "../../api/services";
+} from '../../api/services';
+
+import React from 'react';
 
 class ModifyPrivilege extends React.Component {
   constructor(props) {
     super(props);
     const initialPrivilegeState = {
-      privilege: "",
-      description: "",
+      privilege: '',
+      description: '',
     };
 
     this.state = {
@@ -25,7 +26,7 @@ class ModifyPrivilege extends React.Component {
   componentDidMount() {
     const { id } = this.state;
 
-    if (id !== "add") {
+    if (id !== 'add') {
       getPrivilegeById(id)
         .then((response) => {
           this.setState({ privilege: response.data });
@@ -50,10 +51,10 @@ class ModifyPrivilege extends React.Component {
 
   savePrivilege() {
     const { id, privilege } = this.state;
-    if (id === "add") {
+    if (id === 'add') {
       postPrivilege(privilege)
         .then(() => {
-          this.setState({ redirect: "/privilege" });
+          this.setState({ redirect: '/privilege' });
         })
         .catch((error) => {
           console.log(error);
@@ -61,7 +62,7 @@ class ModifyPrivilege extends React.Component {
     } else {
       putPrivilegeById(id, privilege)
         .then(() => {
-          this.setState({ redirect: "/privilege" });
+          this.setState({ redirect: '/privilege' });
         })
         .catch((error) => {
           console.log(error);
@@ -79,7 +80,7 @@ class ModifyPrivilege extends React.Component {
     return (
       <React.Fragment>
         <label htmlFor="privilege">Privilege Name*: </label>
-        {id === "add" && (
+        {id === 'add' && (
           <input
             type="text"
             id="privilege"
@@ -88,7 +89,7 @@ class ModifyPrivilege extends React.Component {
             onChange={privilegeChangeHandler.bind(this)}
           />
         )}
-        {id !== "add" && <span>{privilege.privilege}</span>}
+        {id !== 'add' && <span>{privilege.privilege}</span>}
         <br />
 
         <label htmlFor="description">Description: </label>

@@ -1,6 +1,8 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { deletePrivilegeById, getPrivileges } from "../../api/services";
+import { deletePrivilegeById, getPrivileges } from '../../api/services';
+
+import { Link } from 'react-router-dom';
+import React from 'react';
+
 class PrivilegeList extends React.Component {
   constructor(props) {
     super(props);
@@ -19,7 +21,7 @@ class PrivilegeList extends React.Component {
 
         for (const key in response.data) {
           let priv = response.data[key];
-          priv["id"] = key;
+          priv['id'] = key;
           loadedPrivileges.push(priv);
 
           privilegesCheckedToDelete.push({

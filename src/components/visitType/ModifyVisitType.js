@@ -1,11 +1,12 @@
-import React from 'react';
-import { withRouter, Redirect } from 'react-router-dom';
+import { Redirect, withRouter } from 'react-router-dom';
 import {
-  getVisitTypeById,
   createVisitType,
-  updateVisitTypeById,
   deleteVisitTypeById,
+  getVisitTypeById,
+  updateVisitTypeById,
 } from '../../api/services';
+
+import React from 'react';
 
 class ModifyVisitType extends React.Component {
   constructor(props) {

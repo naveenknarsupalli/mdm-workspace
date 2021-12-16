@@ -1,5 +1,3 @@
-import axios from 'axios';
-
 import {
   CONCEPT,
   CONCEPT_CLASS,
@@ -9,6 +7,8 @@ import {
   RELATIONSHIP,
   VISIT_TYPE,
 } from '../constants/serviceConstants';
+
+import axios from 'axios';
 
 // const SUFFIX = `.json`;
 const SUFFIX = ``;
@@ -72,16 +72,16 @@ export const putPrivilegeById = (id, body) =>
 export const deletePrivilegeById = (id) =>
   axios.delete(`${PRIVILEGE}/${id}${SUFFIX}`).then((res) => res);
 
-// relationship apis
-export const getRelationships = () =>
+// relationshipType apis
+export const getRelationshipTypes = () =>
   axios.get(`${RELATIONSHIP}`).then((res) => res);
-export const getRelationshipById = (id) =>
+export const getRelationshipTypeById = (id) =>
   axios.get(`${RELATIONSHIP}/${id}${SUFFIX}`).then((res) => res);
-export const createRelationship = (body) =>
+export const createRelationshipType = (body) =>
   axios.post(`${RELATIONSHIP}${SUFFIX}`, body).then((res) => res);
-export const updateRelationshipById = (id, body) =>
+export const updateRelationshipTypeById = (id, body) =>
   axios.put(`${RELATIONSHIP}/${id}${SUFFIX}`, body).then((res) => res);
-export const deleteRelationshipById = (id) =>
+export const deleteRelationshipTypeById = (id) =>
   axios.delete(`${RELATIONSHIP}/${id}${SUFFIX}`).then((res) => res);
 
 // visitType apis

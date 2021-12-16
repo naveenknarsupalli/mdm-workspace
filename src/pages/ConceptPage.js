@@ -1,7 +1,7 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import ConceptList from "../components/concept/ConceptList";
-import FindConcept from "../components/concept/FindConcept";
+import ConceptList from '../components/concept/ConceptList';
+import FindConcept from '../components/concept/FindConcept';
+import { Link } from 'react-router-dom';
+import React from 'react';
 
 function ConceptPage() {
   return (

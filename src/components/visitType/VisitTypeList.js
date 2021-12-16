@@ -1,5 +1,5 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
+import React from 'react';
 import { getVisitTypes } from '../../api/services';
 
 class VisitTypeList extends React.Component {

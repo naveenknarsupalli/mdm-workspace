@@ -1,19 +1,20 @@
-import React from "react";
-import { Redirect, withRouter } from "react-router-dom";
+import { Redirect, withRouter } from 'react-router-dom';
 import {
   deleteConceptClassById,
   getConceptClassById,
   postConceptClass,
   putConceptClassById,
-} from "../../api/services";
+} from '../../api/services';
+
+import React from 'react';
 
 class ModifyConceptClass extends React.Component {
   constructor(props) {
     super(props);
     const initialConceptClassState = {
-      name: "",
-      description: "",
-      retireReason: "",
+      name: '',
+      description: '',
+      retireReason: '',
       retired: false,
     };
     this.state = { conceptClass: initialConceptClassState, redirect: null };
@@ -21,7 +22,7 @@ class ModifyConceptClass extends React.Component {
 
   componentDidMount() {
     const conceptClassId = this.props.match.params.id;
-    if (conceptClassId !== "add") {
+    if (conceptClassId !== 'add') {
       getConceptClassById(conceptClassId)
         .then((response) => {
           this.setState({ conceptClass: response.data });
@@ -56,10 +57,10 @@ class ModifyConceptClass extends React.Component {
     event.preventDefault();
     const { conceptClass } = this.state;
     const conceptClassId = this.props.match.params.id;
-    if (conceptClassId === "add") {
+    if (conceptClassId === 'add') {
       postConceptClass(conceptClass)
         .then(() => {
-          this.setState({ redirect: "/conceptClass" });
+          this.setState({ redirect: '/conceptClass' });
         })
         .catch((error) => {
           console.log(error);
@@ -67,7 +68,7 @@ class ModifyConceptClass extends React.Component {
     } else {
       putConceptClassById(conceptClassId, conceptClass)
         .then(() => {
-          this.setState({ redirect: "/conceptClass" });
+          this.setState({ redirect: '/conceptClass' });
         })
         .catch((error) => {
           console.log(error);
@@ -76,7 +77,7 @@ class ModifyConceptClass extends React.Component {
   }
 
   cancelButtonHandler(event) {
-    this.setState({ redirect: "/conceptClass" });
+    this.setState({ redirect: '/conceptClass' });
   }
 
   retireConceptClass(event) {
@@ -88,7 +89,7 @@ class ModifyConceptClass extends React.Component {
     this.setState({ conceptClass: conceptClass }, () => {
       putConceptClassById(conceptClassId, conceptClass)
         .then(() => {
-          this.setState({ redirect: "/conceptClass" });
+          this.setState({ redirect: '/conceptClass' });
         })
         .catch((error) => {
           console.log(error);
@@ -101,7 +102,7 @@ class ModifyConceptClass extends React.Component {
     const conceptClassId = this.props.match.params.id;
     deleteConceptClassById(conceptClassId)
       .then(() => {
-        this.setState({ redirect: "/conceptClass" });
+        this.setState({ redirect: '/conceptClass' });
       })
       .catch((error) => {
         console.log(error);
@@ -131,9 +132,9 @@ class ModifyConceptClass extends React.Component {
 
     // const conceptClassId = this.props.match.params.id;
     const submitButtonContent =
-      this.props.match.params.id === "add"
-        ? "Add Concept Class"
-        : "Save Concept Class";
+      this.props.match.params.id === 'add'
+        ? 'Add Concept Class'
+        : 'Save Concept Class';
 
     return (
       <React.Fragment>
@@ -168,7 +169,7 @@ class ModifyConceptClass extends React.Component {
           </button>
         </form>
 
-        {this.props.match.params.id !== "add" && (
+        {this.props.match.params.id !== 'add' && (
           <div>
             <hr />
             <p>Retire this Concept Class</p>
@@ -188,7 +189,7 @@ class ModifyConceptClass extends React.Component {
           </div>
         )}
 
-        {this.props.match.params.id !== "add" && (
+        {this.props.match.params.id !== 'add' && (
           <div>
             <hr />
             <p>Permanently Delete Concept Class</p>

@@ -1,6 +1,6 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import ConceptClassList from "../components/conceptClass/ConceptClassList";
+import ConceptClassList from '../components/conceptClass/ConceptClassList';
+import { Link } from 'react-router-dom';
+import React from 'react';
 
 function ConceptClassPage() {
   return (

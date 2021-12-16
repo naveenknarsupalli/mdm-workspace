@@ -1,6 +1,6 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import PrivilegeList from "../components/privilege/PrivilegeList";
+import { Link } from 'react-router-dom';
+import PrivilegeList from '../components/privilege/PrivilegeList';
+import React from 'react';
 
 function PrivilegePage() {
   return (
