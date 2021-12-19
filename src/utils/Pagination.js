@@ -23,3 +23,5 @@ const Pagination = ({ itemsPerPage, totalItems, paginate }) => {
   );
 };
 export default Pagination;
+
+// test
