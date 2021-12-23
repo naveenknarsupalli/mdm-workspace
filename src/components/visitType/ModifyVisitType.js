@@ -157,7 +157,7 @@ class ModifyVisitType extends React.Component {
           <br />
 
           <label htmlFor="description">
-            Description:
+            Description :
             <textarea
               id="description"
               name="description"

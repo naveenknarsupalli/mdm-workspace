@@ -41,7 +41,7 @@ class VisitTypeList extends React.Component {
               <td>Description</td>
             </tr>
             {visitTypes.map((visitType) => (
-              <tr key={visitType.visitTypeId}>
+              <tr key={visitType.uuid}>
                 <td>
                   <Link to={`/visitType/${visitType.uuid}`}>
                     {visitType.name}
