@@ -9,27 +9,20 @@ class DrugList extends React.Component {
       drugs: [],
       filteredDrugsOnRetired: [],
       showRetired: false,
+      isLoading: true,
     };
   }
 
   componentDidMount() {
     getDrugs()
       .then((response) => {
-        const loadedDrugs = [];
-
-        for (const key in response.data) {
-          loadedDrugs.push({
-            drugId: key,
-            name: response.data[key].name,
-            strength: response.data[key].strength,
-            retired: response.data[key].retired,
+        this.setState({ drugs: response.data }, () => {
+          this.setState({
+            filteredDrugsOnRetired: this.state.drugs.filter((drug) => {
+              return drug.retired === false;
+            }),
+            isLoading: false,
           });
-        }
-        this.setState({ drugs: loadedDrugs }, () => {
-          const filteredDrugsOnRetired = this.state.drugs.filter((drug) => {
-            return drug.retired === false;
-          });
-          this.setState({ filteredDrugsOnRetired: filteredDrugsOnRetired });
         });
       })
       .catch((error) => {
@@ -43,43 +36,50 @@ class DrugList extends React.Component {
       if (showRetired) {
         this.setState({ filteredDrugsOnRetired: drugs });
       } else {
-        const filteredDrugsOnRetired = this.state.drugs.filter((drug) => {
-          return drug.retired === false;
+        this.setState({
+          filteredDrugsOnRetired: this.state.drugs.filter((drug) => {
+            return drug.retired === false;
+          }),
         });
-        this.setState({ filteredDrugsOnRetired: filteredDrugsOnRetired });
       }
     }
   }
 
   toggleRetired() {
-    this.setState({ showRetired: !this.state.showRetired });
+    const { showRetired } = this.state;
+    this.setState({ showRetired: !showRetired });
   }
 
   render() {
     const { toggleRetired } = this;
+    const { filteredDrugsOnRetired, isLoading } = this.state;
+
+    if (isLoading) return <p>Loading ...</p>;
 
     return (
       <React.Fragment>
         <table>
           <thead>
-            <th>
-              <span>Manage Concept Drugs </span>
-              <button type="button" onClick={toggleRetired.bind(this)}>
-                Toggle Retired
-              </button>
-            </th>
-          </thead>
-          <tbody>
             <tr>
-              <td>Name</td>
-              <td>Strength</td>
+              <th>
+                <span>Manage Concept Drugs </span>
+                <button type="button" onClick={toggleRetired.bind(this)}>
+                  Toggle Retired
+                </button>
+              </th>
             </tr>
+            <tr>
+              <th>Name</th>
+              <th>Strength</th>
+            </tr>
+          </thead>
 
-            {this.state.filteredDrugsOnRetired.map((drug) => {
+          <tbody>
+            {filteredDrugsOnRetired.map((drug) => {
               return (
-                <tr key={drug.drugId}>
+                <tr key={drug.uuid}>
                   <td>
-                    <Link to={`/drug/${drug.drugId}`}>{drug.name}</Link>
+                    <Link to={`/drug/${drug.uuid}`}>{drug.name}</Link>
                   </td>
                   <td>{drug.strength}</td>
                 </tr>
