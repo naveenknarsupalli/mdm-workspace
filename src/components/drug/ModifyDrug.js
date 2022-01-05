@@ -15,15 +15,25 @@ class ModifyDrug extends React.Component {
     super(props);
 
     const initialDrugState = {
-      name: '',
-      conceptId: '',
+      changedBy: '',
       combination: false,
+      conceptId: '',
+      creator: '',
+      dateChanged: '',
+      dateCreated: '',
+      dateRetired: '',
       dosageForm: '',
-      strength: '',
-      minimumDailyDose: '',
+      drugId: '',
+      drugOrderCollection: [],
       maximumDailyDose: '',
-      retired: false,
+      minimumDailyDose: '',
+      name: '',
       retireReason: '',
+      retired: false,
+      retiredBy: '',
+      route: '',
+      strength: '',
+      uuid: '',
     };
 
     this.state = {
@@ -31,42 +41,44 @@ class ModifyDrug extends React.Component {
       redirect: null,
       drugId: this.props.match.params.id,
       options: [],
-      defaultConceptIdValue: {},
-      defaultDosageFormValue: {},
       isLoading: true,
     };
   }
 
   componentDidMount() {
     const { drugId } = this.state;
+
+    console.log('start', new Date());
+
     getConcepts()
       .then((response) => {
-        const loadedOptions = [];
-        for (const key in response.data) {
-          loadedOptions.push({
-            value: key,
-            label: response.data[key].shortName,
+        const options = [];
+
+        // for (const key in response.data) {
+        //   options.push({
+        //     value: response.data[key].uuid,
+        //     label: response.data[key].shortName,
+        //   });
+        // }
+
+        Object.keys(response.data).forEach((key) => {
+          options.push({
+            value: response.data[key].uuid,
+            label: response.data[key].name,
           });
-        }
-        this.setState({ options: loadedOptions }, () => {
+        });
+
+        this.setState({ options }, () => {
           if (drugId !== 'add') {
             getDrugById(drugId)
               .then((response) => {
-                this.setState(
-                  { drug: response.data, isLoading: false }
-                  //   , () => {
-                  //   const filtered = this.state.options.filter(
-                  //     (option) => option.value === this.state.drug.conceptId
-                  //   );
-                  //   this.setState({ defaultConceptIdValue: filtered }, () => {
-                  //     this.setState({ isLoading: true });
-                  //   });
-                  // }
-                );
+                this.setState({ drug: response.data, isLoading: false });
               })
               .catch((error) => {
                 console.log(error);
               });
+          } else {
+            this.setState({ isLoading: false });
           }
         });
       })
@@ -75,10 +87,14 @@ class ModifyDrug extends React.Component {
       });
   }
 
+  getValueFor(field) {
+    return field === null ? '' : field;
+  }
+
   unretireDrug() {
     const { drug, drugId } = this.state;
     drug.retired = false;
-    this.setState({ drug: drug }, () => {
+    this.setState({ drug }, () => {
       putDrugById(drugId, drug)
         .then(() => {
           this.setState({ redirect: '/drug' });
@@ -92,19 +108,20 @@ class ModifyDrug extends React.Component {
   nameChangeHandler(event) {
     const { drug } = this.state;
     drug.name = event.target.value;
-    this.setState({ drug: drug });
+    this.setState({ drug });
   }
 
   conceptIdChangeHandler(selectedOption) {
     const { drug } = this.state;
     drug.conceptId = selectedOption.value;
-    this.setState({ drug: drug });
+    this.setState({ drug });
   }
 
   filterOptions(option, inputValue) {
     const { label, value } = option;
     return (
-      label.toLowerCase().includes(inputValue.toLowerCase()) ||
+      (label != null &&
+        label.toLowerCase().includes(inputValue.toLowerCase())) ||
       value.toLowerCase().includes(inputValue.toLowerCase())
     );
   }
@@ -112,37 +129,37 @@ class ModifyDrug extends React.Component {
   combinationChangeHandler(event) {
     const { drug } = this.state;
     drug.combination = event.target.checked;
-    this.setState({ drug: drug });
+    this.setState({ drug });
   }
 
   dosageFormChangeHandler(selectedOption) {
     const { drug } = this.state;
     drug.dosageForm = selectedOption.value;
-    this.setState({ drug: drug });
+    this.setState({ drug });
   }
 
   strengthChangeHandler(event) {
     const { drug } = this.state;
     drug.strength = event.target.value;
-    this.setState({ drug: drug });
+    this.setState({ drug });
   }
 
   minimumDailyDoseChangeHandler(event) {
     const { drug } = this.state;
     drug.minimumDailyDose = event.target.value;
-    this.setState({ drug: drug });
+    this.setState({ drug });
   }
 
   maximumDailyDoseChangeHandler(event) {
     const { drug } = this.state;
     drug.maximumDailyDose = event.target.value;
-    this.setState({ drug: drug });
+    this.setState({ drug });
   }
 
   retireReasonChangeHandler(event) {
     const { drug } = this.state;
     drug.retireReason = event.target.value;
-    this.setState({ drug: drug });
+    this.setState({ drug });
   }
 
   submitDrugFormHandler() {
@@ -173,7 +190,7 @@ class ModifyDrug extends React.Component {
   retireDrug() {
     let { drug, drugId } = this.state;
     drug.retired = true;
-    this.setState({ drug: drug }, () => {
+    this.setState({ drug }, () => {
       putDrugById(drugId, drug)
         .then(() => {})
         .catch((error) => {
@@ -206,14 +223,12 @@ class ModifyDrug extends React.Component {
       minimumDailyDoseChangeHandler,
       maximumDailyDoseChangeHandler,
       retireReasonChangeHandler,
-    } = this;
-
-    const {
       unretireDrug,
       submitDrugFormHandler,
       cancelButtonHandler,
       retireDrug,
       deleteDrug,
+      getValueFor,
     } = this;
 
     const { drug, redirect, drugId, options, isLoading } = this.state;
@@ -226,8 +241,6 @@ class ModifyDrug extends React.Component {
       (option) => option.value === drug.dosageForm
     );
 
-    console.log(getDefaultConceptIdValue, 'getDefaultConceptIdValue');
-
     if (redirect) {
       return <Redirect to={redirect} />;
     }
@@ -235,6 +248,7 @@ class ModifyDrug extends React.Component {
     if (!isLoading || drugId === 'add') {
       return (
         <React.Fragment>
+          {console.log(options)}
           <p>Concept Drug Management</p>
           {drug.retired && (
             <p>
@@ -253,7 +267,7 @@ class ModifyDrug extends React.Component {
               id="name"
               name="name"
               onChange={nameChangeHandler.bind(this)}
-              value={drug.name}
+              value={getValueFor(drug.name)}
             />
             <br />
 
@@ -277,7 +291,7 @@ class ModifyDrug extends React.Component {
               id="combination"
               name="combination"
               onChange={combinationChangeHandler.bind(this)}
-              checked={drug.combination}
+              checked={getValueFor(drug.combination)}
             />
             <br />
 
@@ -301,7 +315,7 @@ class ModifyDrug extends React.Component {
               id="strength"
               name="strength"
               onChange={strengthChangeHandler.bind(this)}
-              value={drug.strength}
+              value={getValueFor(drug.strength)}
             />
             <br />
 
@@ -311,7 +325,7 @@ class ModifyDrug extends React.Component {
               id="minimumDailyDose"
               name="minimumDailyDose"
               onChange={minimumDailyDoseChangeHandler.bind(this)}
-              value={drug.minimumDailyDose}
+              value={getValueFor(drug.minimumDailyDose)}
               step="any"
             />
             <br />
@@ -322,7 +336,7 @@ class ModifyDrug extends React.Component {
               id="maximumDailyDose"
               name="maximumDailyDose"
               onChange={maximumDailyDoseChangeHandler.bind(this)}
-              value={drug.maximumDailyDose}
+              value={getValueFor(drug.maximumDailyDose)}
               step="any"
             />
             <br />
@@ -345,7 +359,7 @@ class ModifyDrug extends React.Component {
                 id="retireReason"
                 name="retireReason"
                 onChange={retireReasonChangeHandler.bind(this)}
-                value={drug.retireReason}
+                value={getValueFor(drug.retireReason)}
               />
               <br />
               <button type="button" onClick={retireDrug.bind(this)}>

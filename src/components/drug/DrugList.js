@@ -16,14 +16,18 @@ class DrugList extends React.Component {
   componentDidMount() {
     getDrugs()
       .then((response) => {
-        this.setState({ drugs: response.data }, () => {
-          this.setState({
-            filteredDrugsOnRetired: this.state.drugs.filter((drug) => {
-              return drug.retired === false;
-            }),
-            isLoading: false,
-          });
-        });
+        this.setState(
+          { filteredDrugsOnRetired: response.data }
+          // , () => {
+          // this.setState({
+          //   // filteredDrugsOnRetired: this.state.drugs.filter((drug) => {
+          //   //   return drug.retired === false;
+          //   // }),
+          //   isLoading: false,
+          // }
+          //   );
+          // }
+        );
       })
       .catch((error) => {
         console.log(error);
@@ -54,7 +58,7 @@ class DrugList extends React.Component {
     const { toggleRetired } = this;
     const { filteredDrugsOnRetired, isLoading } = this.state;
 
-    if (isLoading) return <p>Loading ...</p>;
+    // if (isLoading) return <p>Loading ...</p>;
 
     return (
       <React.Fragment>
