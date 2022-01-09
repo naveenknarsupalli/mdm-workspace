@@ -1,3 +1,4 @@
+import { INTERNAL_LINK } from '../../styles/bootstrap';
 import { Link } from 'react-router-dom';
 import React from 'react';
 import { getPersonAttributeTypes } from '../../api/services';
@@ -36,22 +37,25 @@ class PersonAttributeTypeList extends React.Component {
         <table>
           <thead>
             <tr>
-              <th>AttributeTypes</th>
+              <th colSpan="5">Attribute Types</th>
+            </tr>
+            <tr>
+              <th>Name</th>
+              <th>Format</th>
+              <th>Searchable</th>
+              <th>Description</th>
+              <th>Edit privilege</th>
             </tr>
           </thead>
 
           <tbody>
-            <tr>
-              <td>Name</td>
-              <td>Format</td>
-              <td>Searchable</td>
-              <td>Description</td>
-              <td>Edit privilege</td>
-            </tr>
             {personAttributeTypes.map((personAttributeType) => (
               <tr key={personAttributeType.personAttributeTypeId}>
                 <td>
-                  <Link to={`/personAttributeType/${personAttributeType.uuid}`}>
+                  <Link
+                    to={`/personAttributeType/${personAttributeType.uuid}`}
+                    className={INTERNAL_LINK}
+                  >
                     {personAttributeType.name}
                   </Link>
                 </td>

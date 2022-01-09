@@ -40,6 +40,7 @@ class ModifyDrug extends React.Component {
       drug: initialDrugState,
       redirect: null,
       drugId: this.props.match.params.id,
+      concepts: [],
       options: [],
       isLoading: true,
     };
@@ -48,23 +49,16 @@ class ModifyDrug extends React.Component {
   componentDidMount() {
     const { drugId } = this.state;
 
-    console.log('start', new Date());
-
     getConcepts()
       .then((response) => {
+        this.setState({ concepts: response.data });
+
         const options = [];
-
-        // for (const key in response.data) {
-        //   options.push({
-        //     value: response.data[key].uuid,
-        //     label: response.data[key].shortName,
-        //   });
-        // }
-
         Object.keys(response.data).forEach((key) => {
           options.push({
             value: response.data[key].uuid,
             label: response.data[key].name,
+            conceptNameId: response.data[key].conceptNameId,
           });
         });
 
@@ -118,11 +112,14 @@ class ModifyDrug extends React.Component {
   }
 
   filterOptions(option, inputValue) {
+    // console.log('inFilterOption', option.data);
     const { label, value } = option;
+    const { data } = option;
     return (
       (label != null &&
         label.toLowerCase().includes(inputValue.toLowerCase())) ||
-      value.toLowerCase().includes(inputValue.toLowerCase())
+      value.toLowerCase().includes(inputValue.toLowerCase()) ||
+      data.conceptNameId.toLowerCase().includes(inputValue.toLowerCase())
     );
   }
 
@@ -248,7 +245,7 @@ class ModifyDrug extends React.Component {
     if (!isLoading || drugId === 'add') {
       return (
         <React.Fragment>
-          {console.log(options)}
+          {/* {console.log(options)} */}
           <p>Concept Drug Management</p>
           {drug.retired && (
             <p>

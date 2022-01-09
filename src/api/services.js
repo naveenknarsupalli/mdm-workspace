@@ -1,6 +1,7 @@
 import {
   CONCEPT,
   CONCEPT_CLASS,
+  CONCEPT_NAME,
   DRUG,
   PERSON_ATTRIBUTE_TYPE,
   PRIVILEGE,
@@ -12,6 +13,10 @@ import axios from 'axios';
 
 // const SUFFIX = `.json`;
 const SUFFIX = ``;
+
+// list of all concept names
+export const getConceptNames = () =>
+  axios.get(`${CONCEPT_NAME}${SUFFIX}`).then((res) => res);
 
 // concept apis
 export const getConcepts = () =>
@@ -28,17 +33,20 @@ export const deleteConceptById = (id) =>
 // conceptClass apis
 export const getConceptClasses = () =>
   axios.get(`${CONCEPT_CLASS}${SUFFIX}`).then((res) => res);
-export const getConceptClassById = (id) =>
-  axios.get(`${CONCEPT_CLASS}/${id}${SUFFIX}`).then((res) => res);
-export const postConceptClass = (body) =>
-  axios.post(`${CONCEPT_CLASS}${SUFFIX}`, body).then((res) => res);
-export const putConceptClassById = (id, body) =>
-  axios.put(`${CONCEPT_CLASS}/${id}${SUFFIX}`, body).then((res) => res);
-export const deleteConceptClassById = (id) =>
-  axios.delete(`${CONCEPT_CLASS}/${id}${SUFFIX}`).then((res) => res);
+// export const getConceptClassById = (id) =>
+//   axios.get(`${CONCEPT_CLASS}/${id}${SUFFIX}`).then((res) => res);
+// export const postConceptClass = (body) =>
+//   axios.post(`${CONCEPT_CLASS}${SUFFIX}`, body).then((res) => res);
+// export const putConceptClassById = (id, body) =>
+//   axios.put(`${CONCEPT_CLASS}/${id}${SUFFIX}`, body).then((res) => res);
+// export const deleteConceptClassById = (id) =>
+//   axios.delete(`${CONCEPT_CLASS}/${id}${SUFFIX}`).then((res) => res);
 
 // drug apis
-export const getDrugs = () => axios.get(`${DRUG}${SUFFIX}`).then((res) => res);
+export const getDrugs = () =>
+  axios
+    .get(`${DRUG}${SUFFIX}`, { params: { compact: true } })
+    .then((res) => res);
 export const getDrugById = (id) =>
   axios.get(`${DRUG}/${id}${SUFFIX}`).then((res) => res);
 export const postDrug = (body) =>

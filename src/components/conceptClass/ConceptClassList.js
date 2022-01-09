@@ -1,3 +1,4 @@
+import { BUTTON, DELETE_BUTTON } from '../../styles/bootstrap';
 import { Link, Redirect } from 'react-router-dom';
 import React, { Fragment } from 'react';
 import { deleteConceptById, getConceptClasses } from '../../api/services';
@@ -129,12 +130,29 @@ class ConceptClassList extends React.Component {
 
     return (
       <Fragment>
-        <h3>Manage Concept Classes</h3>
-        <button type="button" onClick={this.toggleRetired.bind(this)}>
-          Toggle Retired
-        </button>
+        <div className="d-flex justify-content-between">
+          <button
+            type="button"
+            onClick={this.deleteCheckedConceptClassesHandler.bind(this)}
+            className={DELETE_BUTTON}
+          >
+            Delete Checked Concept Classes
+          </button>
+          <button
+            type="button"
+            onClick={this.toggleRetired.bind(this)}
+            className={BUTTON}
+          >
+            Toggle Retired
+          </button>
+        </div>
+
         <table>
           <thead>
+            <tr></tr>
+            <tr>
+              <th colSpan="3">Concept Classes</th>
+            </tr>
             <tr>
               <th></th>
               <th>Name</th>
@@ -164,12 +182,6 @@ class ConceptClassList extends React.Component {
             })}
           </tbody>
         </table>
-        <button
-          type="button"
-          onClick={this.deleteCheckedConceptClassesHandler.bind(this)}
-        >
-          Delete Checked Concept Classes
-        </button>
       </Fragment>
     );
   }

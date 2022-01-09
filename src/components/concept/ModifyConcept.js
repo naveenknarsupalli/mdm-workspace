@@ -3,42 +3,124 @@ import { Redirect, withRouter } from 'react-router-dom';
 import {
   deleteConceptById,
   getConceptById,
+  getConceptClasses,
+  getConceptNames,
   postConcept,
   putConceptById,
 } from '../../api/services';
+
+import Select from 'react-select/dist/declarations/src/Select';
 
 class ModifyConcept extends React.Component {
   constructor(props) {
     super(props);
     const initialConceptState = {
-      shortName: '',
-      description: '',
-      retireReason: '',
-      retired: false,
+      shortName: 'test',
+      description: 'this is the first id',
+      formText: null,
+      isSet: false,
+      version: null,
+      classId: 1,
+      conceptNumeric: {
+        hiAbsolute: null,
+        hiCritical: null,
+        hiNormal: null,
+        lowAbsolute: null,
+        lowCritical: null,
+        lowNormal: null,
+        units: null,
+        precise: true,
+        displayPrecision: null,
+      },
+      datatypeId: {
+        conceptDatatypeId: 1,
+      },
+      conceptNames: [
+        {
+          name: 'Vero',
+          conceptNameType: 'INDEX_TERM',
+        },
+        {
+          name: 'Sì',
+          conceptNameType: 'INDEX_TERM',
+        },
+      ],
+      conceptAnswers: [
+        {
+          answerDrug: 20,
+        },
+        {
+          answerConcept: 40,
+        },
+        {
+          answerConcept: 60,
+        },
+      ],
+      conceptComplex: 'ImageURlHandler',
+      mappings: [
+        {
+          conceptReferenceTermId: 34,
+          conceptMapTypeId: 43,
+        },
+        {
+          conceptReferenceTermId: 4,
+          conceptMapTypeId: 33,
+        },
+      ],
+      conceptSets: [{ conceptId: 1 }, { conceptId: 2 }],
     };
     this.state = {
       concept: initialConceptState,
       redirect: null,
       conceptId: this.props.match.params.id,
+      classOptions: [],
+      conceptOptions: [],
     };
   }
 
   componentDidMount() {
+    getConceptClasses()
+      .then((response) => {
+        const classOptions = [];
+        Object.keys(response.data).forEach((key) => {
+          classOptions.push({
+            label: response.data[key].name,
+            value: response.data[key].conceptClassId,
+          });
+        });
+        this.setState({ classOptions });
+      })
+      .catch((error) => console.log(error));
+
+    getConceptNames()
+      .then((response) => {
+        const conceptOptions = [];
+        Object.keys(response.data).forEach((key) => {
+          conceptOptions.push({
+            label: response.data[key].name,
+            value: response.data[key].conceptNameId,
+          });
+        });
+        this.setState({ conceptOptions });
+      })
+      .catch((error) => console.log(error));
+
     const { conceptId } = this.state;
     if (conceptId !== 'add') {
       getConceptById(conceptId)
         .then((response) => {
           this.setState({
-            concept: {
-              shortName: response.data.shortName,
-              description: response.data.description,
-              retireReason: response.data.retireReason,
-              retired: response.data.retired,
-            },
+            concept: response.data,
           });
         })
         .catch((error) => console.log(error));
     }
+  }
+
+  isSetChangeHandler(event) {
+    const { concept } = this.state;
+    concept.isSet = event.target.checked;
+    this.setState({ concept });
   }
 
   unretire(event) {
@@ -61,6 +143,12 @@ class ModifyConcept extends React.Component {
   descriptionChangeHandler(event) {
     const { concept } = this.state;
     concept.description = event.target.value;
+    this.setState({ concept: concept });
+  }
+
+  versionChangeHandler(event) {
+    const { concept } = this.state;
+    concept.version = event.target.value;
     this.setState({ concept: concept });
   }
 
@@ -121,6 +209,10 @@ class ModifyConcept extends React.Component {
     this.setState({ concept: concept });
   }
 
+  getValueFor(field) {
+    return field === null ? '' : field;
+  }
+
   retireConcept(event) {
     event.preventDefault();
     const { concept, conceptId } = this.state;
@@ -130,6 +222,20 @@ class ModifyConcept extends React.Component {
         .then()
         .catch((error) => console.log(error));
     });
+  }
+
+  classIdChangeHandler(selectedOption) {
+    const { concept } = this.state;
+    concept.classId = selectedOption.value;
+    this.setState({ concept });
+  }
+
+  conceptSetsChangeHandler(selectedOptions) {
+    const conceptSets = [];
+    selectedOptions.forEach((option) => {
+      conceptSets.push({ conceptId: option.value });
+    });
+    this.setState({ conceptSets });
   }
 
   render() {
@@ -143,9 +249,23 @@ class ModifyConcept extends React.Component {
       deleteConcept,
       retireReasonChangeHandler,
       retireConcept,
+      classIdChangeHandler,
+      versionChangeHandler,
+      isSetChangeHandler,
+      getValueFor,
+      conceptSetsChangeHandler,
     } = this;
 
-    const { concept, redirect, conceptId } = this.state;
+    const { concept, redirect, conceptId, classOptions, conceptOptions } =
+      this.state;
+
+    const getDefaultConceptSetsValue = conceptOptions.filter(
+      (conceptOption) => conceptOption.value === concept.conceptSets.conceptId
+    );
+
+    const getDefaultClassIdValue = classOptions.filter(
+      (classOption) => classOption.value === concept.classId
+    );
 
     if (redirect) {
       return <Redirect to={redirect} />;
@@ -185,6 +305,53 @@ class ModifyConcept extends React.Component {
             value={concept.description}
           />
           <br />
+
+          <label htmlFor="classId">Class: </label>
+          <div style={{ width: '300px', display: 'inline-block' }}>
+            <Select
+              id="classId"
+              name="classId"
+              defaultValue={getDefaultClassIdValue}
+              onChange={classIdChangeHandler.bind(this)}
+              options={classOptions}
+            />
+          </div>
+          <br />
+
+          <label htmlFor="isSet">Is Set: </label>
+          <input
+            type="checkbox"
+            id="isSet"
+            name="isSet"
+            onChange={isSetChangeHandler.bind(this)}
+            checked={getValueFor(concept.isSet)}
+          />
+          <br />
+
+          {concept.isSet && (
+            <div>
+              <label htmlFor="conceptSets">Set Members: </label>
+              <div style={{ width: '300px', display: 'inline-block' }}>
+                <Select
+                  id="conceptSets"
+                  name="conceptSets"
+                  defaultValue={getDefaultConceptSetsValue}
+                  onChange={conceptSetsChangeHandler.bind(this)}
+                  options={conceptOptions}
+                />
+              </div>
+              <br />
+            </div>
+          )}
+
+          <label htmlFor="version">Version: </label>
+          <input
+            type="text"
+            id="version"
+            name="version"
+            onChange={versionChangeHandler.bind(this)}
+            value={concept.version}
+          />
 
           <button type="button" onClick={saveConcept.bind(this)}>
             Save Concept

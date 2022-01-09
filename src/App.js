@@ -5,6 +5,7 @@ import { Route, Switch } from 'react-router-dom';
 
 import ConceptClassPage from './pages/ConceptClassPage';
 import ConceptPage from './pages/ConceptPage';
+import DependentFormsPage from './pages/DependentFormsPage';
 import DrugPage from './pages/DrugPage';
 import ModifyConcept from './components/concept/ModifyConcept';
 import ModifyConceptClass from './components/conceptClass/ModifyConceptClass';
@@ -25,6 +26,10 @@ function App() {
     <React.Fragment>
       <NavBar />
       <Switch>
+        <Route path="/dependentForms">
+          <DependentFormsPage />
+        </Route>
+
         <Route path="/concept/:id">
           <ModifyConcept />
         </Route>

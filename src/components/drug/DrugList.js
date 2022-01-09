@@ -56,7 +56,10 @@ class DrugList extends React.Component {
 
   render() {
     const { toggleRetired } = this;
-    const { filteredDrugsOnRetired, isLoading } = this.state;
+    const {
+      filteredDrugsOnRetired,
+      //  isLoading
+    } = this.state;
 
     // if (isLoading) return <p>Loading ...</p>;
 
