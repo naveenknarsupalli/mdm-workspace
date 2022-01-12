@@ -31,9 +31,7 @@ class ConceptList extends React.Component {
           {concepts.map((concept) => {
             return (
               <li key={concept.conceptId}>
-                <Link to={`/concept/${concept.conceptId}`}>
-                  {concept.shortName}
-                </Link>
+                <Link to={`/concept/${concept.uuid}`}>{concept.shortName}</Link>
               </li>
             );
           })}

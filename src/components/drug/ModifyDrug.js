@@ -30,7 +30,6 @@ class ModifyDrug extends React.Component {
       drug: initialDrugState,
       redirect: null,
       drugId: this.props.match.params.id,
-      concepts: [],
       options: [],
       isLoading: true,
       error: false,
@@ -42,13 +41,17 @@ class ModifyDrug extends React.Component {
 
     getConceptNames()
       .then((response) => {
-        this.setState({ concepts: response.data });
-
+        const conceptNames = response.data.filter(
+          (concept) =>
+            concept['conceptNameType'] === 'FULLY_SPECIFIED' &&
+            concept['locale'] === 'en'
+        );
+        console.log(conceptNames);
         const options = [];
-        Object.keys(response.data).forEach((key) => {
+        Object.keys(conceptNames).forEach((key) => {
           options.push({
-            value: response.data[key].conceptId,
-            label: response.data[key].name,
+            value: conceptNames[key].conceptId,
+            label: conceptNames[key].name,
           });
         });
 
