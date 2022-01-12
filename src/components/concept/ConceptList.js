@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import React from 'react';
 import { getConcepts } from '../../api/services';
 
+// TEST CODE
 class ConceptList extends React.Component {
   constructor(props) {
     super(props);
