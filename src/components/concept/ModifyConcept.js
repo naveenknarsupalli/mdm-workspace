@@ -5,11 +5,14 @@ import {
   getConceptById,
   getConceptClasses,
   getConceptNames,
+  getDrugs,
   postConcept,
   putConceptById,
 } from '../../api/services';
 
-import Select from 'react-select/dist/declarations/src/Select';
+import CodedDatatype from './CodedDatatype';
+import NumericDatatype from './NumericDatatype';
+import Select from 'react-select';
 
 class ModifyConcept extends React.Component {
   constructor(props) {
@@ -29,7 +32,7 @@ class ModifyConcept extends React.Component {
         lowCritical: null,
         lowNormal: null,
         units: null,
-        precise: true,
+        precise: false,
         displayPrecision: null,
       },
       datatypeId: {
@@ -75,6 +78,7 @@ class ModifyConcept extends React.Component {
       conceptId: this.props.match.params.id,
       classOptions: [],
       conceptOptions: [],
+      drugOptions: [],
     };
   }
 
@@ -105,6 +109,19 @@ class ModifyConcept extends React.Component {
       })
       .catch((error) => console.log(error));
 
+    getDrugs()
+      .then((response) => {
+        const drugOptions = [];
+        Object.keys(response.data).forEach((key) => {
+          drugOptions.push({
+            label: response.data[key].name,
+            value: response.data[key].drugId,
+          });
+        });
+        this.setState({ drugOptions });
+      })
+      .catch((error) => console.log(error));
+
     const { conceptId } = this.state;
     if (conceptId !== 'add') {
       getConceptById(conceptId)
@@ -116,6 +133,18 @@ class ModifyConcept extends React.Component {
         .catch((error) => console.log(error));
     }
   }
+
+  collectCodedInfo = (conceptAnswers) => {
+    const { concept } = this.state;
+    concept.conceptAnswers = conceptAnswers;
+    this.setState({ concept });
+  };
+
+  collectConceptNumericInfo = (conceptNumeric) => {
+    const { concept } = this.state;
+    concept.conceptNumeric = conceptNumeric;
+    this.setState({ concept });
+  };
 
   isSetChangeHandler(event) {
     const { concept } = this.state;
@@ -254,10 +283,20 @@ class ModifyConcept extends React.Component {
       isSetChangeHandler,
       getValueFor,
       conceptSetsChangeHandler,
+      collectConceptNumericInfo,
+      collectCodedInfo,
     } = this;
 
-    const { concept, redirect, conceptId, classOptions, conceptOptions } =
-      this.state;
+    const {
+      concept,
+      redirect,
+      conceptId,
+      classOptions,
+      conceptOptions,
+      drugOptions,
+    } = this.state;
+
+    console.log('concept', concept);
 
     const getDefaultConceptSetsValue = conceptOptions.filter(
       (conceptOption) => conceptOption.value === concept.conceptSets.conceptId
@@ -333,6 +372,7 @@ class ModifyConcept extends React.Component {
               <label htmlFor="conceptSets">Set Members: </label>
               <div style={{ width: '300px', display: 'inline-block' }}>
                 <Select
+                  isMulti
                   id="conceptSets"
                   name="conceptSets"
                   defaultValue={getDefaultConceptSetsValue}
@@ -343,6 +383,20 @@ class ModifyConcept extends React.Component {
               <br />
             </div>
           )}
+
+          <p> Display Datatype</p>
+
+          <NumericDatatype
+            conceptNumeric={concept.conceptNumeric}
+            onBlur={collectConceptNumericInfo}
+          />
+
+          <CodedDatatype
+            conceptAnswers={concept.conceptAnswers}
+            conceptOptions={conceptOptions}
+            drugOptions={drugOptions}
+            collectCodedInfo={collectCodedInfo}
+          />
 
           <label htmlFor="version">Version: </label>
           <input

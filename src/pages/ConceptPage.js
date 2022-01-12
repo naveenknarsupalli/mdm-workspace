@@ -1,4 +1,4 @@
-import ConceptList from '../components/concept/ConceptList';
+// import ConceptList from '../components/concept/ConceptList';
 import FindConcept from '../components/concept/FindConcept';
 import { Link } from 'react-router-dom';
 import React from 'react';
@@ -12,7 +12,7 @@ function ConceptPage() {
         Add New Concept
       </Link>
       <FindConcept />
-      <ConceptList />
+      {/* <ConceptList /> */}
     </React.Fragment>
   );
 }

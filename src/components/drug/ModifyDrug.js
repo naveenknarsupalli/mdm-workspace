@@ -1,7 +1,7 @@
 import { Redirect, withRouter } from 'react-router-dom';
 import {
   deleteDrugById,
-  getConcepts,
+  getConceptNames,
   getDrugById,
   postDrug,
   putDrugById,
@@ -15,25 +15,15 @@ class ModifyDrug extends React.Component {
     super(props);
 
     const initialDrugState = {
-      changedBy: '',
       combination: false,
       conceptId: '',
-      creator: '',
-      dateChanged: '',
-      dateCreated: '',
-      dateRetired: '',
       dosageForm: '',
-      drugId: '',
-      drugOrderCollection: [],
       maximumDailyDose: '',
       minimumDailyDose: '',
       name: '',
-      retireReason: '',
       retired: false,
-      retiredBy: '',
-      route: '',
       strength: '',
-      uuid: '',
+      retireReason: '',
     };
 
     this.state = {
@@ -43,22 +33,22 @@ class ModifyDrug extends React.Component {
       concepts: [],
       options: [],
       isLoading: true,
+      error: false,
     };
   }
 
   componentDidMount() {
     const { drugId } = this.state;
 
-    getConcepts()
+    getConceptNames()
       .then((response) => {
         this.setState({ concepts: response.data });
 
         const options = [];
         Object.keys(response.data).forEach((key) => {
           options.push({
-            value: response.data[key].uuid,
+            value: response.data[key].conceptId,
             label: response.data[key].name,
-            conceptNameId: response.data[key].conceptNameId,
           });
         });
 
@@ -112,14 +102,11 @@ class ModifyDrug extends React.Component {
   }
 
   filterOptions(option, inputValue) {
-    // console.log('inFilterOption', option.data);
     const { label, value } = option;
-    const { data } = option;
     return (
       (label != null &&
         label.toLowerCase().includes(inputValue.toLowerCase())) ||
-      value.toLowerCase().includes(inputValue.toLowerCase()) ||
-      data.conceptNameId.toLowerCase().includes(inputValue.toLowerCase())
+      value.toString().toLowerCase().includes(inputValue.toLowerCase())
     );
   }
 
@@ -161,22 +148,26 @@ class ModifyDrug extends React.Component {
 
   submitDrugFormHandler() {
     const { drug, drugId } = this.state;
-    if (drugId === 'add') {
-      postDrug(drug)
-        .then(() => {
-          this.setState({ redirect: '/drug' });
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    } else {
-      putDrugById(drugId, drug)
-        .then(() => {
-          this.setState({ redirect: '/drug' });
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+    if (drug.name === '' || drug.conceptId === '')
+      this.setState({ error: true });
+    else {
+      if (drugId === 'add') {
+        postDrug(drug)
+          .then(() => {
+            this.setState({ redirect: '/drug' });
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      } else {
+        putDrugById(drugId, drug)
+          .then(() => {
+            this.setState({ redirect: '/drug' });
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
     }
   }
 
@@ -228,7 +219,7 @@ class ModifyDrug extends React.Component {
       getValueFor,
     } = this;
 
-    const { drug, redirect, drugId, options, isLoading } = this.state;
+    const { drug, redirect, drugId, options, isLoading, error } = this.state;
 
     const getDefaultConceptIdValue = options.filter(
       (option) => option.value === drug.conceptId
@@ -245,7 +236,7 @@ class ModifyDrug extends React.Component {
     if (!isLoading || drugId === 'add') {
       return (
         <React.Fragment>
-          {/* {console.log(options)} */}
+          {error && <p>Fill the required fields</p>}
           <p>Concept Drug Management</p>
           {drug.retired && (
             <p>
@@ -258,7 +249,7 @@ class ModifyDrug extends React.Component {
           <hr />
 
           <form>
-            <label htmlFor="name">Name: </label>
+            <label htmlFor="name">Name*: </label>
             <input
               type="text"
               id="name"

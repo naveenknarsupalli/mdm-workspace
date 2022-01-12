@@ -33,14 +33,14 @@ export const deleteConceptById = (id) =>
 // conceptClass apis
 export const getConceptClasses = () =>
   axios.get(`${CONCEPT_CLASS}${SUFFIX}`).then((res) => res);
-// export const getConceptClassById = (id) =>
-//   axios.get(`${CONCEPT_CLASS}/${id}${SUFFIX}`).then((res) => res);
-// export const postConceptClass = (body) =>
-//   axios.post(`${CONCEPT_CLASS}${SUFFIX}`, body).then((res) => res);
-// export const putConceptClassById = (id, body) =>
-//   axios.put(`${CONCEPT_CLASS}/${id}${SUFFIX}`, body).then((res) => res);
-// export const deleteConceptClassById = (id) =>
-//   axios.delete(`${CONCEPT_CLASS}/${id}${SUFFIX}`).then((res) => res);
+export const getConceptClassById = (id) =>
+  axios.get(`${CONCEPT_CLASS}/${id}${SUFFIX}`).then((res) => res);
+export const postConceptClass = (body) =>
+  axios.post(`${CONCEPT_CLASS}${SUFFIX}`, body).then((res) => res);
+export const putConceptClassById = (id, body) =>
+  axios.put(`${CONCEPT_CLASS}/${id}${SUFFIX}`, body).then((res) => res);
+export const deleteConceptClassById = (id) =>
+  axios.delete(`${CONCEPT_CLASS}/${id}${SUFFIX}`).then((res) => res);
 
 // drug apis
 export const getDrugs = () =>
