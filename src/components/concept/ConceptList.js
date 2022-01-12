@@ -11,22 +11,11 @@ class ConceptList extends React.Component {
   }
 
   componentDidMount() {
-    this.loadAllConcepts();
-  }
-
-  loadAllConcepts() {
     getConcepts()
       .then((response) => {
-        const loadedConcepts = [];
-
-        for (const key in response.data) {
-          loadedConcepts.push({
-            conceptId: key,
-            shortName: response.data[key].shortName,
-          });
-        }
-
-        this.setState({ concepts: loadedConcepts });
+        this.setState({ concepts: response.data }, () => {
+          console.log('concepts', this.state.concepts);
+        });
       })
       .catch((error) => {
         console.log(error);
@@ -34,10 +23,11 @@ class ConceptList extends React.Component {
   }
 
   render() {
+    const { concepts } = this.state;
     return (
       <React.Fragment>
         <ul>
-          {this.state.concepts.map((concept) => {
+          {concepts.map((concept) => {
             return (
               <li key={concept.conceptId}>
                 <Link to={`/concept/${concept.conceptId}`}>
