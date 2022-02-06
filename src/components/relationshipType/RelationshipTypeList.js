@@ -1,12 +1,12 @@
-import { Link } from 'react-router-dom';
-import React from 'react';
-import { getRelationshipTypes } from '../../api/services';
+import { Link } from "react-router-dom";
+import React from "react";
+import { getRelationshipTypes } from "../../api/services";
 
 class RelationshipTypeList extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      relationshipTypes: [],
+      relationshipTypes: []
     };
   }
 

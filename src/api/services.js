@@ -1,18 +1,28 @@
 import {
   CONCEPT,
   CONCEPT_CLASS,
+  CONCEPT_DATA_TYPE,
   CONCEPT_NAME,
   DRUG,
   PERSON_ATTRIBUTE_TYPE,
   PRIVILEGE,
   RELATIONSHIP,
   VISIT_TYPE,
-} from '../constants/serviceConstants';
+  USER
+} from "../constants/serviceConstants";
 
-import axios from 'axios';
+import axios from "axios";
 
 // const SUFFIX = `.json`;
 const SUFFIX = ``;
+
+export const getMockConcepts = () =>
+  axios
+    .get(`https://mdmworkspace.free.beeceptor.com/concepts`)
+    .then((res) => res);
+
+// user apis
+export const getUsers = () => axios.get(`${USER}${SUFFIX}`).then((res) => res);
 
 // list of all concept names
 export const getConceptNames = () =>
@@ -41,6 +51,10 @@ export const putConceptClassById = (id, body) =>
   axios.put(`${CONCEPT_CLASS}/${id}${SUFFIX}`, body).then((res) => res);
 export const deleteConceptClassById = (id) =>
   axios.delete(`${CONCEPT_CLASS}/${id}${SUFFIX}`).then((res) => res);
+
+// conceptDataType apis
+export const getConceptDataTypes = () =>
+  axios.get(`${CONCEPT_DATA_TYPE}${SUFFIX}`).then((res) => res);
 
 // drug apis
 export const getDrugs = () =>

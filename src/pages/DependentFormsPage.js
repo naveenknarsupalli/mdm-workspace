@@ -1,6 +1,6 @@
-import { Link } from 'react-router-dom';
-import React from 'react';
-import { SECONDARY_LINK } from '../styles/bootstrap';
+import { Link } from "react-router-dom";
+import React from "react";
+import { SECONDARY_LINK } from "../styles/bootstrap";
 
 function DependentFormsPage() {
   return (
@@ -13,6 +13,9 @@ function DependentFormsPage() {
       </Link>
       <Link to="/privilege" className={SECONDARY_LINK}>
         Privilege
+      </Link>
+      <Link to="/testConcept/add" className={SECONDARY_LINK}>
+        Test Concept
       </Link>
     </React.Fragment>
   );

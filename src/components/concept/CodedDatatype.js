@@ -1,6 +1,6 @@
-import { Component, Fragment } from 'react';
+import { Component, Fragment } from "react";
 
-import Select from 'react-select';
+import Select from "react-select";
 
 class CodedDatatype extends Component {
   constructor(props) {
@@ -10,12 +10,15 @@ class CodedDatatype extends Component {
       conceptOptions: this.props.conceptOptions,
       drugOptions: this.props.drugOptions,
       answerConcepts: [],
-      drugConcepts: [],
+      drugConcepts: []
     };
   }
 
   componentDidMount() {
     const { conceptAnswers } = this.state;
+    const { conceptOptions, drugOptions } = this.state;
+    console.log("co", conceptOptions);
+    console.log("do", drugOptions);
 
     const splitConceptAnswers = async () => {
       const answerConcepts = [];
@@ -70,10 +73,14 @@ class CodedDatatype extends Component {
     const {
       filterOptions,
       answerConceptChangeHandler,
-      answerDrugChangeHandler,
+      answerDrugChangeHandler
     } = this;
-    const { answerConcepts, drugConcepts, conceptOptions, drugOptions } =
-      this.state;
+    const {
+      answerConcepts,
+      drugConcepts,
+      conceptOptions,
+      drugOptions
+    } = this.state;
 
     const getDefaultAnswerConceptValue = conceptOptions.filter(
       (option) => option.value === answerConcepts.answerConcept
@@ -87,7 +94,7 @@ class CodedDatatype extends Component {
       <Fragment>
         <p>Answers</p>
         <label htmlFor="answerConcept">Select Concepts: </label>
-        <div style={{ width: '300px', display: 'inline-block' }}>
+        <div style={{ width: "300px", display: "inline-block" }}>
           <Select
             isMulti
             id="answerConcept"
@@ -99,8 +106,10 @@ class CodedDatatype extends Component {
             filterOption={filterOptions}
           />
         </div>
+        <br />
+
         <label htmlFor="answerDrug">Select Concept Drugs: </label>
-        <div style={{ width: '300px', display: 'inline-block' }}>
+        <div style={{ width: "300px", display: "inline-block" }}>
           <Select
             isMulti
             id="answerDrug"
@@ -112,6 +121,7 @@ class CodedDatatype extends Component {
             filterOption={filterOptions}
           />
         </div>
+        <br />
       </Fragment>
     );
   }

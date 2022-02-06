@@ -1,25 +1,26 @@
-import './App.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import "./App.css";
+import "bootstrap/dist/css/bootstrap.min.css";
 
-import { Route, Switch } from 'react-router-dom';
+import { Route, Switch } from "react-router-dom";
 
-import ConceptClassPage from './pages/ConceptClassPage';
-import ConceptPage from './pages/ConceptPage';
-import DependentFormsPage from './pages/DependentFormsPage';
-import DrugPage from './pages/DrugPage';
-import ModifyConcept from './components/concept/ModifyConcept';
-import ModifyConceptClass from './components/conceptClass/ModifyConceptClass';
-import ModifyDrug from './components/drug/ModifyDrug';
-import ModifyPersonAttributeType from './components/personAttributeType/ModifyPersonAttributeType';
-import ModifyPrivilege from './components/privilege/ModifyPrivilege';
-import ModifyRelationshipType from './components/relationshipType/ModifyRelationshipType';
-import ModifyVisitType from './components/visitType/ModifyVisitType';
-import NavBar from './pages/NavBar';
-import PersonAttributeTypePage from './pages/PersonAttributeTypePage';
-import PrivilegePage from './pages/PrivilegePage';
-import React from 'react';
-import RelationshipTypePage from './pages/RelationshipTypePage';
-import VisitTypePage from './pages/VisitTypePage';
+import ConceptClassPage from "./pages/ConceptClassPage";
+import ConceptPage from "./pages/ConceptPage";
+import DependentFormsPage from "./pages/DependentFormsPage";
+import DrugPage from "./pages/DrugPage";
+import ModifyConcept from "./components/concept/ModifyConcept";
+import ModifyConceptClass from "./components/conceptClass/ModifyConceptClass";
+import ModifyDrug from "./components/drug/ModifyDrug";
+import ModifyPersonAttributeType from "./components/personAttributeType/ModifyPersonAttributeType";
+import ModifyPrivilege from "./components/privilege/ModifyPrivilege";
+import ModifyRelationshipType from "./components/relationshipType/ModifyRelationshipType";
+import ModifyVisitType from "./components/visitType/ModifyVisitType";
+import NavBar from "./pages/NavBar";
+import PersonAttributeTypePage from "./pages/PersonAttributeTypePage";
+import PrivilegePage from "./pages/PrivilegePage";
+import React from "react";
+import RelationshipTypePage from "./pages/RelationshipTypePage";
+import VisitTypePage from "./pages/VisitTypePage";
+import UserPage from "./pages/UserPage";
 
 function App() {
   return (
@@ -77,6 +78,10 @@ function App() {
         </Route>
         <Route path="/personAttributeType">
           <PersonAttributeTypePage />
+        </Route>
+
+        <Route path="/user">
+          <UserPage />
         </Route>
       </Switch>
     </React.Fragment>

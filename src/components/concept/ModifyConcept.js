@@ -1,29 +1,30 @@
-import React, { Fragment } from 'react';
-import { Redirect, withRouter } from 'react-router-dom';
+import React, { Fragment } from "react";
+import { Redirect, withRouter } from "react-router-dom";
 import {
   deleteConceptById,
   getConceptById,
   getConceptClasses,
+  getConceptDataTypes,
   getConceptNames,
   getDrugs,
   postConcept,
-  putConceptById,
-} from '../../api/services';
+  putConceptById
+} from "../../api/services";
 
-import CodedDatatype from './CodedDatatype';
-import NumericDatatype from './NumericDatatype';
-import Select from 'react-select';
+import Select from "react-select";
+import CONCEPT_COMPLEX_HANDLERS from "../../constants/conceptComplexHandlers";
 
 class ModifyConcept extends React.Component {
   constructor(props) {
     super(props);
     const initialConceptState = {
-      shortName: 'test',
-      description: 'this is the first id',
-      formText: null,
+      shortName: "",
+      description: "",
       isSet: false,
       version: null,
       classId: 1,
+      retired: false,
+      retireReason: "",
       conceptNumeric: {
         hiAbsolute: null,
         hiCritical: null,
@@ -33,45 +34,49 @@ class ModifyConcept extends React.Component {
         lowNormal: null,
         units: null,
         precise: false,
-        displayPrecision: null,
+        displayPrecision: null
       },
       datatypeId: {
-        conceptDatatypeId: 1,
+        conceptDatatypeId: 1
       },
       conceptNames: [
         {
-          name: 'Vero',
-          conceptNameType: 'INDEX_TERM',
+          name: "",
+          conceptNameType: "FULLY_SPECIFIED"
         },
         {
-          name: 'Sì',
-          conceptNameType: 'INDEX_TERM',
-        },
+          name: "",
+          conceptNameType: "INDEX_TERM"
+        }
       ],
       conceptAnswers: [
         {
-          answerDrug: 20,
+          answerDrug: 20
         },
         {
-          answerConcept: 40,
+          answerConcept: 55
         },
         {
-          answerConcept: 60,
+          answerConcept: 40
         },
+        {
+          answerDrug: 2
+        }
       ],
-      conceptComplex: 'ImageURlHandler',
+      conceptComplex: "",
       mappings: [
         {
           conceptReferenceTermId: 34,
-          conceptMapTypeId: 43,
+          conceptMapTypeId: 43
         },
         {
           conceptReferenceTermId: 4,
-          conceptMapTypeId: 33,
-        },
+          conceptMapTypeId: 33
+        }
       ],
-      conceptSets: [{ conceptId: 1 }, { conceptId: 2 }],
+      conceptSets: [{ conceptId: 4 }, { conceptId: 5 }]
     };
+
     this.state = {
       concept: initialConceptState,
       redirect: null,
@@ -79,59 +84,31 @@ class ModifyConcept extends React.Component {
       classOptions: [],
       conceptOptions: [],
       drugOptions: [],
+      dataTypeOptions: [],
+      synonyms: initialConceptState.conceptNames.filter(
+        (item) => item.conceptNameType !== "FULLY_SPECIFIED"
+      ),
+      isLoading: true
     };
+    this.removeSynonymButtonHandler = this.removeSynonymButtonHandler.bind(
+      this
+    );
+    this.synonymNameChangeHandler = this.synonymNameChangeHandler.bind(this);
   }
 
-  componentDidMount() {
-    getConceptClasses()
-      .then((response) => {
-        const classOptions = [];
-        Object.keys(response.data).forEach((key) => {
-          classOptions.push({
-            label: response.data[key].name,
-            value: response.data[key].conceptClassId,
-          });
-        });
-        this.setState({ classOptions });
-      })
-      .catch((error) => console.log(error));
+  mergeConceptnames() {
+    const { synonyms, concept } = this.state;
+    const fullySpecifiedName = concept.conceptNames.find(
+      (item) => item.conceptNameType === "FULLY_SPECIFIED"
+    );
+    const syns = synonyms.filter((item) => item.name.trim() !== "");
 
-    getConceptNames()
-      .then((response) => {
-        const conceptOptions = [];
-        Object.keys(response.data).forEach((key) => {
-          conceptOptions.push({
-            label: response.data[key].name,
-            value: response.data[key].conceptNameId,
-          });
-        });
-        this.setState({ conceptOptions });
-      })
-      .catch((error) => console.log(error));
+    concept.conceptNames = [fullySpecifiedName, ...syns];
+    this.setState({ concept });
+  }
 
-    getDrugs()
-      .then((response) => {
-        const drugOptions = [];
-        Object.keys(response.data).forEach((key) => {
-          drugOptions.push({
-            label: response.data[key].name,
-            value: response.data[key].drugId,
-          });
-        });
-        this.setState({ drugOptions });
-      })
-      .catch((error) => console.log(error));
-
-    const { conceptId } = this.state;
-    if (conceptId !== 'add') {
-      getConceptById(conceptId)
-        .then((response) => {
-          this.setState({
-            concept: response.data,
-          });
-        })
-        .catch((error) => console.log(error));
-    }
+  getValueFor(field) {
+    return field === null ? "" : field;
   }
 
   collectCodedInfo = (conceptAnswers) => {
@@ -183,28 +160,32 @@ class ModifyConcept extends React.Component {
 
   saveConcept(event) {
     event.preventDefault();
+    this.mergeConceptnames();
 
     const { conceptId, concept } = this.state;
-    if (conceptId === 'add') {
-      postConcept(concept)
-        .then(() => {
-          this.setState({ redirect: '/concept' });
-        })
-        .catch((error) => console.log(error));
-    } else {
-      putConceptById(conceptId, concept)
-        .then(() => {
-          this.setState({ redirect: '/concept' });
-        })
-        .catch((error) => console.log(error));
-    }
+    console.log("concept", concept);
+
+    // if (conceptId === "add") {
+    //   postConcept(concept)
+    //     .then(() => {
+    //       this.setState({ redirect: "/concept" });
+    //     })
+    //     .catch((error) => console.log(error));
+    // } else {
+    //   putConceptById(conceptId, concept)
+    //     .then(() => {
+    //       this.setState({ redirect: "/concept" });
+    //     })
+    //     .catch((error) => console.log(error));
+    // }
   }
 
   saveConceptAndContinue(event) {
     event.preventDefault();
+    this.mergeConceptnames();
 
     const { conceptId, concept } = this.state;
-    if (conceptId === 'add') {
+    if (conceptId === "add") {
       postConcept(concept)
         .then((response) => {
           this.setState({ conceptId: response.data.name });
@@ -219,7 +200,7 @@ class ModifyConcept extends React.Component {
 
   cancelConcept(event) {
     event.preventDefault();
-    this.setState({ redirect: '/concept' });
+    this.setState({ redirect: "/concept" });
   }
 
   deleteConcept(event) {
@@ -227,7 +208,7 @@ class ModifyConcept extends React.Component {
     const { conceptId } = this.state;
     deleteConceptById(conceptId)
       .then(() => {
-        this.setState({ redirect: '/concept' });
+        this.setState({ redirect: "/concept" });
       })
       .catch((error) => console.log(error));
   }
@@ -236,10 +217,6 @@ class ModifyConcept extends React.Component {
     const { concept } = this.state;
     concept.retireReason = event.target.value;
     this.setState({ concept: concept });
-  }
-
-  getValueFor(field) {
-    return field === null ? '' : field;
   }
 
   retireConcept(event) {
@@ -259,12 +236,309 @@ class ModifyConcept extends React.Component {
     this.setState({ concept });
   }
 
+  dataTypeChangeHandler(selectedOption) {
+    const { concept } = this.state;
+    concept.datatypeId.conceptDatatypeId = selectedOption.value;
+    this.setState({ concept });
+  }
+
+  conceptComplexChangeHandler(selectedOption) {
+    const { concept } = this.state;
+    concept.conceptComplex = selectedOption.value;
+    this.setState({ concept });
+  }
+
+  componentDidMount() {
+    const { conceptId } = this.state;
+
+    getConceptClasses()
+      .then((response) => {
+        const classOptions = [];
+        Object.keys(response.data).forEach((key) => {
+          classOptions.push({
+            label: response.data[key].name,
+            value: response.data[key].conceptClassId
+          });
+        });
+        this.setState({ classOptions }, () => {
+          getConceptNames()
+            .then((response) => {
+              const conceptOptions = [];
+              Object.keys(response.data).forEach((key) => {
+                conceptOptions.push({
+                  label: response.data[key].name,
+                  value: response.data[key].conceptId
+                });
+              });
+              this.setState({ conceptOptions }, () => {
+                getDrugs()
+                  .then((response) => {
+                    const drugOptions = [];
+                    Object.keys(response.data).forEach((key) => {
+                      drugOptions.push({
+                        label: response.data[key].name,
+                        value: response.data[key].drugId
+                      });
+                    });
+                    this.setState({ drugOptions }, () => {
+                      getConceptDataTypes()
+                        .then((response) => {
+                          const dataTypeOptions = [];
+                          Object.keys(response.data).forEach((key) => {
+                            dataTypeOptions.push({
+                              label: response.data[key].name,
+                              value: response.data[key].conceptDatatypeId
+                            });
+                          });
+                          this.setState({ dataTypeOptions }, () => {
+                            if (conceptId !== "add") {
+                              getConceptById(conceptId)
+                                .then((response) => {
+                                  this.setState(
+                                    {
+                                      concept: response.data
+                                    },
+                                    () => {
+                                      const {
+                                        conceptNames
+                                      } = this.state.concept;
+                                      const synonyms = conceptNames.filter(
+                                        (item) =>
+                                          item.conceptNameType !==
+                                          "FULLY_SPECIFIED"
+                                      );
+                                      if (synonyms.length === 0) {
+                                        synonyms.push({
+                                          name: "",
+                                          conceptNameType: "INDEX_TERM"
+                                        });
+                                      }
+
+                                      this.setState({
+                                        synonyms,
+                                        isLoading: false
+                                      });
+                                    }
+                                  );
+                                })
+                                .catch((error) => console.log(error));
+                            } else {
+                              this.setState({ isLoading: false });
+                            }
+                          });
+                        })
+                        .catch((error) => console.log(error));
+                    });
+                  })
+                  .catch((error) => console.log(error));
+              });
+            })
+            .catch((error) => console.log(error));
+        });
+      })
+      .catch((error) => console.log(error));
+  }
+
+  getDefaultConceptSetsValue() {
+    const { conceptSets } = this.state.concept;
+    const { conceptOptions } = this.state;
+
+    let defaultConceptSetsValue = [];
+    conceptSets.forEach((concept) => {
+      const eachValueOptions = conceptOptions.filter(
+        (conceptOption) => conceptOption.value === concept.conceptId
+      );
+      defaultConceptSetsValue = [
+        ...defaultConceptSetsValue,
+        ...eachValueOptions
+      ];
+    });
+    return defaultConceptSetsValue;
+  }
+
+  answerConceptChangeHandler(selectedOptions) {
+    const { conceptAnswers } = this.state.concept;
+    const answerDrugs = [];
+    conceptAnswers.forEach((concept) => {
+      if (concept.answerDrug) {
+        answerDrugs.push(concept);
+      }
+    });
+
+    const answerConcepts = [];
+    selectedOptions.forEach((option) => {
+      const found = answerConcepts.some(
+        (answerConcept) => answerConcept.answerConcept === option.value
+      );
+      if (!found) answerConcepts.push({ answerConcept: option.value });
+    });
+
+    const newConceptAnswers = [...answerDrugs, ...answerConcepts];
+
+    const { concept } = this.state;
+    concept.conceptAnswers = newConceptAnswers;
+    this.setState({ concept });
+  }
+
+  answerDrugChangeHandler(selectedOptions) {
+    const { conceptAnswers } = this.state.concept;
+    const answerConcepts = [];
+    conceptAnswers.forEach((concept) => {
+      if (concept.answerConcept) {
+        answerConcepts.push(concept);
+      }
+    });
+
+    const answerDrugs = [];
+    selectedOptions.forEach((option) => {
+      const found = answerDrugs.some(
+        (answerDrug) => answerDrug.answerDrug === option.value
+      );
+      if (!found) answerDrugs.push({ answerDrug: option.value });
+    });
+
+    const newDrugAnswers = [...answerDrugs, ...answerConcepts];
+
+    const { concept } = this.state;
+    concept.conceptAnswers = newDrugAnswers;
+    this.setState({ concept });
+  }
+
+  getDefaultAnswerConceptValue() {
+    const { conceptAnswers } = this.state.concept;
+    const { conceptOptions } = this.state;
+
+    let defaultAnswerConceptValue = [];
+    conceptAnswers.forEach((concept) => {
+      if (concept.answerConcept) {
+        const eachValueOptions = conceptOptions.filter(
+          (conceptOption) => conceptOption.value === concept.answerConcept
+        );
+        defaultAnswerConceptValue = [
+          ...defaultAnswerConceptValue,
+          ...eachValueOptions
+        ];
+      }
+    });
+    return defaultAnswerConceptValue;
+  }
+
+  getDefaultAnswerDrugValue() {
+    const { conceptAnswers } = this.state.concept;
+    const { drugOptions } = this.state;
+
+    let defaultAnswerDrugValue = [];
+    conceptAnswers.forEach((concept) => {
+      if (concept.answerDrug) {
+        const eachValueOptions = drugOptions.filter(
+          (drugOption) => drugOption.value === concept.answerDrug
+        );
+        defaultAnswerDrugValue = [
+          ...defaultAnswerDrugValue,
+          ...eachValueOptions
+        ];
+      }
+    });
+    return defaultAnswerDrugValue;
+  }
+
   conceptSetsChangeHandler(selectedOptions) {
     const conceptSets = [];
     selectedOptions.forEach((option) => {
-      conceptSets.push({ conceptId: option.value });
+      const found = conceptSets.some(
+        (conceptSet) => conceptSet.conceptId === option.value
+      );
+      if (!found) conceptSets.push({ conceptId: option.value });
     });
-    this.setState({ conceptSets });
+    const { concept } = this.state;
+    concept.conceptSets = conceptSets;
+    this.setState({ concept });
+  }
+
+  hiAbsoluteChangeHandler(event) {
+    const { concept } = this.state;
+    concept.conceptNumeric["hiAbsolute"] = event.target.value;
+    this.setState({ concept });
+  }
+
+  hiCriticalChangeHandler(event) {
+    const { concept } = this.state;
+    concept.conceptNumeric["hiCritical"] = event.target.value;
+    this.setState({ concept });
+  }
+
+  hiNormalChangeHandler(event) {
+    const { concept } = this.state;
+    concept.conceptNumeric["hiNormal"] = event.target.value;
+    this.setState({ concept });
+  }
+
+  lowAbsoluteChangeHandler(event) {
+    const { concept } = this.state;
+    concept.conceptNumeric["lowAbsolute"] = event.target.value;
+    this.setState({ concept });
+  }
+
+  lowCriticalChangeHandler(event) {
+    const { concept } = this.state;
+    concept.conceptNumeric["lowCritical"] = event.target.value;
+    this.setState({ concept });
+  }
+
+  lowNormalChangeHandler(event) {
+    const { concept } = this.state;
+    concept.conceptNumeric["lowNormal"] = event.target.value;
+    this.setState({ concept });
+  }
+
+  preciseChangeHandler(event) {
+    const { concept } = this.state;
+    concept.conceptNumeric["precise"] = event.target.checked;
+    this.setState({ concept });
+  }
+
+  filterOptions(option, inputValue) {
+    const { label, value } = option;
+    return (
+      (label != null &&
+        label.toLowerCase().includes(inputValue.toLowerCase())) ||
+      value.toString().toLowerCase().includes(inputValue.toLowerCase())
+    );
+  }
+
+  fullySpecifiedNameChangeHandler(event) {
+    const { concept } = this.state;
+    const fullySpecifiedNameIndex = concept.conceptNames.findIndex(
+      (item) => item.conceptNameType === "FULLY_SPECIFIED"
+    );
+    concept.conceptNames[fullySpecifiedNameIndex].name = event.target.value;
+    this.setState({ concept });
+  }
+
+  synonymNameChangeHandler(event, index) {
+    const { synonyms } = this.state;
+    const syns = [...synonyms];
+    syns[index].name = event.target.value;
+    this.setState({ synonyms: syns });
+  }
+
+  removeSynonymButtonHandler(index) {
+    const { synonyms } = this.state;
+    const syns = [...synonyms];
+    syns.splice(index, 1);
+    this.setState({ synonyms: syns });
+  }
+
+  addSynonymButtonHandler() {
+    const { synonyms } = this.state;
+    const syns = [
+      ...synonyms,
+      {
+        name: "",
+        conceptNameType: "INDEX_TERM"
+      }
+    ];
+    this.setState({ synonyms: syns });
   }
 
   render() {
@@ -279,12 +553,29 @@ class ModifyConcept extends React.Component {
       retireReasonChangeHandler,
       retireConcept,
       classIdChangeHandler,
+      dataTypeChangeHandler,
       versionChangeHandler,
+      conceptComplexChangeHandler,
       isSetChangeHandler,
       getValueFor,
       conceptSetsChangeHandler,
-      collectConceptNumericInfo,
-      collectCodedInfo,
+      getDefaultConceptSetsValue,
+      hiAbsoluteChangeHandler,
+      hiCriticalChangeHandler,
+      hiNormalChangeHandler,
+      lowAbsoluteChangeHandler,
+      lowCriticalChangeHandler,
+      lowNormalChangeHandler,
+      preciseChangeHandler,
+      filterOptions,
+      getDefaultAnswerConceptValue,
+      getDefaultAnswerDrugValue,
+      answerConceptChangeHandler,
+      answerDrugChangeHandler,
+      fullySpecifiedNameChangeHandler,
+      synonymNameChangeHandler,
+      addSynonymButtonHandler,
+      removeSynonymButtonHandler
     } = this;
 
     const {
@@ -294,156 +585,408 @@ class ModifyConcept extends React.Component {
       classOptions,
       conceptOptions,
       drugOptions,
+      dataTypeOptions,
+      isLoading,
+      synonyms
     } = this.state;
 
-    console.log('concept', concept);
+    const dataType = concept.datatypeId.conceptDatatypeId;
+    const { conceptNumeric, conceptNames } = concept;
 
-    const getDefaultConceptSetsValue = conceptOptions.filter(
-      (conceptOption) => conceptOption.value === concept.conceptSets.conceptId
+    const getFullySpecifiedName = () => {
+      const fullySpecifiedNameObject = conceptNames.find(
+        (item) => item.conceptNameType === "FULLY_SPECIFIED"
+      );
+      return fullySpecifiedNameObject.name;
+    };
+    const fullySpecifiedName = getFullySpecifiedName();
+
+    const getDefaultDataTypeValue = dataTypeOptions.filter(
+      (dataTypeOption) => dataTypeOption.value === dataType
     );
 
     const getDefaultClassIdValue = classOptions.filter(
       (classOption) => classOption.value === concept.classId
     );
 
+    const getDefaultConceptComplexValue = CONCEPT_COMPLEX_HANDLERS.filter(
+      (conceptComplexHandler) =>
+        conceptComplexHandler.value === concept.conceptComplex
+    );
+
     if (redirect) {
       return <Redirect to={redirect} />;
     }
 
-    return (
-      <Fragment>
-        {conceptId !== 'add' && concept.retired && (
-          <div>
-            <p>
-              This concept is retired by (user) (retiredDate) - Retired from
-              user interface
-            </p>
-            <button type="button" onClick={unretire.bind(this)}>
-              Unretire
-            </button>
-          </div>
-        )}
-
-        <form>
-          <label htmlFor="shortName">Short Name: </label>
-          <input
-            type="text"
-            id="shortName"
-            name="shortName"
-            onChange={shortNameChangeHandler.bind(this)}
-            value={concept.shortName}
-          />
-          <br />
-
-          <label htmlFor="description">Description: </label>
-          <input
-            type="text"
-            id="description"
-            name="description"
-            onChange={descriptionChangeHandler.bind(this)}
-            value={concept.description}
-          />
-          <br />
-
-          <label htmlFor="classId">Class: </label>
-          <div style={{ width: '300px', display: 'inline-block' }}>
-            <Select
-              id="classId"
-              name="classId"
-              defaultValue={getDefaultClassIdValue}
-              onChange={classIdChangeHandler.bind(this)}
-              options={classOptions}
-            />
-          </div>
-          <br />
-
-          <label htmlFor="isSet">Is Set: </label>
-          <input
-            type="checkbox"
-            id="isSet"
-            name="isSet"
-            onChange={isSetChangeHandler.bind(this)}
-            checked={getValueFor(concept.isSet)}
-          />
-          <br />
-
-          {concept.isSet && (
+    if (!isLoading || conceptId === "add") {
+      return (
+        <Fragment>
+          {conceptId !== "add" && concept.retired && (
             <div>
-              <label htmlFor="conceptSets">Set Members: </label>
-              <div style={{ width: '300px', display: 'inline-block' }}>
-                <Select
-                  isMulti
-                  id="conceptSets"
-                  name="conceptSets"
-                  defaultValue={getDefaultConceptSetsValue}
-                  onChange={conceptSetsChangeHandler.bind(this)}
-                  options={conceptOptions}
-                />
-              </div>
-              <br />
+              <p>
+                This concept is retired by (user) (retiredDate) - Retired from
+                user interface
+              </p>
+              <button type="button" onClick={unretire.bind(this)}>
+                Unretire
+              </button>
             </div>
           )}
 
-          <p> Display Datatype</p>
-
-          <NumericDatatype
-            conceptNumeric={concept.conceptNumeric}
-            onBlur={collectConceptNumericInfo}
-          />
-
-          <CodedDatatype
-            conceptAnswers={concept.conceptAnswers}
-            conceptOptions={conceptOptions}
-            drugOptions={drugOptions}
-            collectCodedInfo={collectCodedInfo}
-          />
-
-          <label htmlFor="version">Version: </label>
-          <input
-            type="text"
-            id="version"
-            name="version"
-            onChange={versionChangeHandler.bind(this)}
-            value={concept.version}
-          />
-
-          <button type="button" onClick={saveConcept.bind(this)}>
-            Save Concept
-          </button>
-          <button type="button" onClick={saveConceptAndContinue.bind(this)}>
-            Save and Continue
-          </button>
-          <button type="button" onClick={cancelConcept.bind(this)}>
-            Cancel
-          </button>
-          {conceptId !== 'add' && (
-            <button type="button" onClick={deleteConcept.bind(this)}>
-              Delete
-            </button>
-          )}
-        </form>
-
-        {conceptId !== 'add' && !concept.retired && (
-          <div>
-            <hr />
-            <p>Retire Concept</p>
-            <label htmlFor="retireReason">Reason: </label>
-            <input
-              type="text"
-              id="retireReason"
-              name="retireReason"
-              onChange={retireReasonChangeHandler.bind(this)}
-              value={concept.retireReason}
-            />
+          <form>
+            <label htmlFor="fullySpecifiedName">
+              Fully Specified Name:
+              <input
+                type="text"
+                id="fullySpecifiedName"
+                name="fullySpecifiedName"
+                onChange={fullySpecifiedNameChangeHandler.bind(this)}
+                value={getValueFor(fullySpecifiedName)}
+              />
+            </label>
             <br />
 
-            <button type="button" onClick={retireConcept.bind(this)}>
-              Retire
+            <label>Synonyms:</label>
+            {synonyms.map((item, index) => (
+              <div key={index}>
+                <div>
+                  <input
+                    name="name"
+                    type="text"
+                    id="name"
+                    value={item.name}
+                    onChange={(e) => synonymNameChangeHandler(e, index)}
+                  />
+                  {synonyms.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeSynonymButtonHandler(index)}
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+                <div>
+                  {synonyms.length - 1 === index && (
+                    <button
+                      type="button"
+                      onClick={addSynonymButtonHandler.bind(this)}
+                    >
+                      Add Synonym
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+
+            <br />
+            <label htmlFor="shortName">
+              Short Name:
+              <input
+                type="text"
+                id="shortName"
+                name="shortName"
+                onChange={shortNameChangeHandler.bind(this)}
+                value={getValueFor(concept.shortName)}
+              />
+            </label>
+            <br />
+
+            <label htmlFor="description">
+              Description:
+              <input
+                type="text"
+                id="description"
+                name="description"
+                onChange={descriptionChangeHandler.bind(this)}
+                value={getValueFor(concept.description)}
+              />
+            </label>
+            <br />
+
+            <label htmlFor="classId">
+              Class:
+              <div style={{ width: "300px", display: "inline-block" }}>
+                <Select
+                  id="classId"
+                  name="classId"
+                  defaultValue={
+                    concept.classId === 1
+                      ? { label: "Test", value: 1 }
+                      : getDefaultClassIdValue
+                  }
+                  onChange={classIdChangeHandler.bind(this)}
+                  options={classOptions}
+                />
+              </div>
+            </label>
+            <br />
+
+            <label htmlFor="isSet">
+              Is Set:
+              <input
+                type="checkbox"
+                id="isSet"
+                name="isSet"
+                onChange={isSetChangeHandler.bind(this)}
+                checked={getValueFor(concept.isSet)}
+              />
+            </label>
+            <br />
+
+            {concept.isSet && (
+              <div>
+                <label htmlFor="conceptSets">
+                  Set Members:
+                  <div style={{ width: "500px", display: "inline-block" }}>
+                    <Select
+                      isMulti
+                      id="conceptSets"
+                      name="conceptSets"
+                      defaultValue={getDefaultConceptSetsValue.bind(this)}
+                      onChange={conceptSetsChangeHandler.bind(this)}
+                      options={conceptOptions}
+                    />
+                  </div>
+                </label>
+                <br />
+              </div>
+            )}
+
+            <label htmlFor="dataType">
+              Datatype:
+              <div style={{ width: "300px", display: "inline-block" }}>
+                <Select
+                  id="dataType"
+                  name="dataType"
+                  defaultValue={
+                    dataType === 1
+                      ? { label: "Numeric", value: 1 }
+                      : getDefaultDataTypeValue
+                  }
+                  onChange={dataTypeChangeHandler.bind(this)}
+                  options={dataTypeOptions}
+                />
+              </div>
+            </label>
+            <br />
+
+            {dataType === 1 && (
+              <div>
+                <p>Numeric</p>
+                <label htmlFor="hiAbsolute">
+                  Absolute High
+                  <input
+                    type="text"
+                    id="hiAbsolute"
+                    name="hiAbsolute"
+                    value={getValueFor(conceptNumeric.hiAbsolute)}
+                    onChange={hiAbsoluteChangeHandler.bind(this)}
+                  />
+                </label>
+                <br />
+
+                <label htmlFor="hiCritical">
+                  Critical High
+                  <input
+                    type="text"
+                    id="hiCritical"
+                    name="hiCritical"
+                    value={getValueFor(conceptNumeric.hiCritical)}
+                    onChange={hiCriticalChangeHandler.bind(this)}
+                  />
+                </label>
+                <br />
+
+                <label htmlFor="hiNormal">
+                  Normal High
+                  <input
+                    type="text"
+                    id="hiNormal"
+                    name="hiNormal"
+                    value={getValueFor(conceptNumeric.hiNormal)}
+                    onChange={hiNormalChangeHandler.bind(this)}
+                  />
+                </label>
+                <br />
+
+                <label htmlFor="lowAbsolute">
+                  Absolute Low
+                  <input
+                    type="text"
+                    id="lowAbsolute"
+                    name="lowAbsolute"
+                    value={getValueFor(conceptNumeric.lowAbsolute)}
+                    onChange={lowAbsoluteChangeHandler.bind(this)}
+                  />
+                </label>
+                <br />
+
+                <label htmlFor="lowCritical">
+                  Critical Low
+                  <input
+                    type="text"
+                    id="lowCritical"
+                    name="lowCritical"
+                    value={getValueFor(conceptNumeric.lowCritical)}
+                    onChange={lowCriticalChangeHandler.bind(this)}
+                  />
+                </label>
+                <br />
+
+                <label htmlFor="lowNormal">
+                  Normal Low
+                  <input
+                    type="text"
+                    id="lowNormal"
+                    name="lowNormal"
+                    value={getValueFor(conceptNumeric.lowNormal)}
+                    onChange={lowNormalChangeHandler.bind(this)}
+                  />
+                </label>
+                <br />
+
+                <label htmlFor="precise">
+                  Allow Decimal?
+                  <input
+                    type="checkbox"
+                    id="precise"
+                    name="precise"
+                    checked={getValueFor(conceptNumeric.precise)}
+                    onChange={preciseChangeHandler.bind(this)}
+                  />
+                </label>
+                <br />
+
+                <label htmlFor="displayPrecision">
+                  Display Precision
+                  <input
+                    type="text"
+                    id="displayPrecision"
+                    name="displayPrecision"
+                    value={getValueFor(conceptNumeric.displayPrecision)}
+                    readOnly="true"
+                    disabled="true"
+                  />
+                </label>
+                <br />
+              </div>
+            )}
+
+            {dataType === 2 && (
+              <div>
+                <p>Answers</p>
+                <label htmlFor="answerConcept">Select Concepts: </label>
+                <div style={{ width: "80%", display: "inline-block" }}>
+                  <Select
+                    isMulti
+                    id="answerConcept"
+                    name="answerConcept"
+                    placeholder="Enter concept name or id"
+                    defaultValue={getDefaultAnswerConceptValue.bind(this)}
+                    onChange={answerConceptChangeHandler.bind(this)}
+                    options={conceptOptions}
+                    filterOption={filterOptions}
+                  />
+                </div>
+                <br />
+
+                <label htmlFor="answerDrug">Select Concept Drugs: </label>
+                <div style={{ width: "80%", display: "inline-block" }}>
+                  <Select
+                    isMulti
+                    id="answerDrug"
+                    name="answerDrug"
+                    placeholder="Enter concept drug name or id"
+                    defaultValue={getDefaultAnswerDrugValue.bind(this)}
+                    onChange={answerDrugChangeHandler.bind(this)}
+                    options={drugOptions}
+                    filterOption={filterOptions}
+                  />
+                </div>
+                <br />
+              </div>
+            )}
+
+            {/* {dataType === 2 && (
+              <CodedDatatype
+                conceptAnswers={concept.conceptAnswers}
+                conceptOptions={conceptOptions}
+                drugOptions={drugOptions}
+                collectCodedInfo={collectCodedInfo}
+              />
+            )} */}
+
+            {dataType === 13 && (
+              <div>
+                <label htmlFor="conceptComplexHandler">
+                  Handler:
+                  <div style={{ width: "300px", display: "inline-block" }}>
+                    <Select
+                      id="conceptComplex"
+                      name="conceptComplex"
+                      defaultValue={getDefaultConceptComplexValue}
+                      onChange={conceptComplexChangeHandler.bind(this)}
+                      options={CONCEPT_COMPLEX_HANDLERS}
+                    />
+                  </div>
+                </label>
+              </div>
+            )}
+
+            <label htmlFor="version">
+              Version:
+              <input
+                type="text"
+                id="version"
+                name="version"
+                onChange={versionChangeHandler.bind(this)}
+                value={getValueFor(concept.version)}
+              />
+            </label>
+            <br />
+
+            <button type="button" onClick={saveConcept.bind(this)}>
+              Save Concept
             </button>
-          </div>
-        )}
-      </Fragment>
-    );
+            <button type="button" onClick={saveConceptAndContinue.bind(this)}>
+              Save and Continue
+            </button>
+            <button type="button" onClick={cancelConcept.bind(this)}>
+              Cancel
+            </button>
+            {conceptId !== "add" && (
+              <button type="button" onClick={deleteConcept.bind(this)}>
+                Delete
+              </button>
+            )}
+          </form>
+
+          {conceptId !== "add" && !concept.retired && (
+            <div>
+              <hr />
+              <p>Retire Concept</p>
+              <label htmlFor="retireReason">
+                Reason:
+                <input
+                  type="text"
+                  id="retireReason"
+                  name="retireReason"
+                  onChange={retireReasonChangeHandler.bind(this)}
+                  value={getValueFor(concept.retireReason)}
+                />
+              </label>
+              <br />
+
+              <button type="button" onClick={retireConcept.bind(this)}>
+                Retire
+              </button>
+            </div>
+          )}
+        </Fragment>
+      );
+    }
+    return <p>Loading...</p>;
   }
 }
 
