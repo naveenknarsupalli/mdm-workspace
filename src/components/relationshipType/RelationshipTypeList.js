@@ -1,58 +1,74 @@
 import { Link } from "react-router-dom";
-import React from "react";
+import React, { Fragment } from "react";
 import { getRelationshipTypes } from "../../api/services";
+import MaterialTable from "material-table";
 
 class RelationshipTypeList extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      relationshipTypes: []
+      relationshipTypes: [],
+      isLoading: true
     };
   }
 
   componentDidMount() {
-    getRelationshipTypes()
-      .then((response) => {
-        this.setState({ relationshipTypes: response.data });
-      })
-      .catch((error) => {
-        console.log(error);
+    this.setRelationshipTypes()
+      .finally(() => this.setLoadingFalse())
+      .catch((e) => console.log(e.message));
+  }
+
+  setRelationshipTypes() {
+    return new Promise((resolve, reject) => {
+      getRelationshipTypes()
+        .then((response) => {
+          this.setState({ relationshipTypes: response.data }, () => {
+            resolve("success");
+          });
+        })
+        .catch((e) => reject(e));
+    });
+  }
+
+  setLoadingFalse() {
+    return new Promise((resolve) => {
+      this.setState({ isLoading: false }, () => {
+        resolve("success");
       });
+    });
   }
 
   render() {
-    const { relationshipTypes } = this.state;
+    const { relationshipTypes, isLoading } = this.state;
 
-    if (relationshipTypes.length === 0)
-      return <p>no relationship types exist. create a new one.</p>;
+    const columns = [
+      {
+        title: "Names",
+        field: "aisToB",
+        render: (rowData) => (
+          <Link to={`/relationshipType/${rowData.uuid}`}>
+            {rowData.aisToB}/{rowData.bisToA}
+          </Link>
+        )
+      },
+      {
+        title: "Description",
+        field: "description"
+      }
+    ];
+
+    if (isLoading) return <p>loading...</p>;
 
     return (
-      <React.Fragment>
-        <table>
-          <thead>
-            <tr>
-              <th>Current Relationship Types</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            <tr>
-              <td>Names</td>
-              <td>Description</td>
-            </tr>
-            {relationshipTypes.map((relationshipType) => (
-              <tr key={relationshipType.uuid}>
-                <td>
-                  <Link to={`/relationshipType/${relationshipType.uuid}`}>
-                    {relationshipType.aisToB}/{relationshipType.bisToA}
-                  </Link>
-                </td>
-                <td>{relationshipType.description}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </React.Fragment>
+      <Fragment>
+        <div style={{ maxWidth: "80%", margin: "auto" }}>
+          <MaterialTable
+            title="Relationship Types"
+            data={relationshipTypes}
+            columns={columns}
+          />
+        </div>
+      </Fragment>
     );
   }
 }

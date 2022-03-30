@@ -1,34 +1,35 @@
-import { Redirect, withRouter } from 'react-router-dom';
+import { Redirect, withRouter } from "react-router-dom";
 import {
   createRelationshipType,
   deleteRelationshipTypeById,
   getRelationshipTypeById,
-  updateRelationshipTypeById,
-} from '../../api/services';
+  updateRelationshipTypeById
+} from "../../api/services";
 
-import React from 'react';
+import React from "react";
+import _ from "lodash";
 
 class ModifyRelationshipType extends React.Component {
   constructor(props) {
     super(props);
     const initialRelationshipTypeState = {
-      aisToB: '',
-      bisToA: '',
-      description: '',
-      retireReason: '',
-      retired: false,
+      aisToB: "",
+      bisToA: "",
+      description: "",
+      retireReason: "",
+      retired: false
     };
 
     this.state = {
       relationshipType: initialRelationshipTypeState,
       relationshipTypeId: this.props.match.params.id,
-      redirect: null,
+      redirect: null
     };
   }
 
   componentDidMount() {
     const { relationshipTypeId } = this.state;
-    if (relationshipTypeId !== 'add') {
+    if (relationshipTypeId !== "add") {
       getRelationshipTypeById(relationshipTypeId)
         .then((response) => {
           this.setState({ relationshipType: response.data });
@@ -59,7 +60,7 @@ class ModifyRelationshipType extends React.Component {
 
   saveRelationshipType() {
     const { relationshipTypeId, relationshipType } = this.state;
-    if (relationshipTypeId === 'add')
+    if (relationshipTypeId === "add")
       this.createRelationshipTypeWithData(relationshipType);
     else
       this.updateRelationshipTypeWithData(relationshipTypeId, relationshipType);
@@ -68,7 +69,7 @@ class ModifyRelationshipType extends React.Component {
   createRelationshipTypeWithData(relationshipType) {
     createRelationshipType(relationshipType)
       .then(() => {
-        this.setState({ redirect: '/relationshipType' });
+        this.setState({ redirect: "/relationshipType" });
       })
       .catch((error) => {
         console.log(error);
@@ -78,7 +79,7 @@ class ModifyRelationshipType extends React.Component {
   updateRelationshipTypeWithData(relationshipTypeId, relationshipType) {
     updateRelationshipTypeById(relationshipTypeId, relationshipType)
       .then(() => {
-        this.setState({ redirect: '/relationshipType' });
+        this.setState({ redirect: "/relationshipType" });
       })
       .catch((error) => {
         console.log(error);
@@ -101,7 +102,7 @@ class ModifyRelationshipType extends React.Component {
 
   unretireRelationshipType() {
     const { relationshipTypeId, relationshipType } = this.state;
-    relationshipType.retireReason = '';
+    relationshipType.retireReason = "";
     relationshipType.retired = false;
     this.setState({ relationshipType }, () => {
       this.updateRelationshipTypeWithData(relationshipTypeId, relationshipType);
@@ -112,7 +113,7 @@ class ModifyRelationshipType extends React.Component {
     const { relationshipTypeId } = this.state;
     deleteRelationshipTypeById(relationshipTypeId)
       .then(() => {
-        this.setState({ redirect: '/relationshipType' });
+        this.setState({ redirect: "/relationshipType" });
       })
       .catch((error) => {
         console.log(error);
@@ -120,7 +121,7 @@ class ModifyRelationshipType extends React.Component {
   }
 
   getValueFor(field) {
-    return field === null ? '' : field;
+    return field === null ? "" : field;
   }
 
   render() {
@@ -134,7 +135,7 @@ class ModifyRelationshipType extends React.Component {
       retireRelationshipType,
       unretireRelationshipType,
       deleteRelationshipType,
-      getValueFor,
+      getValueFor
     } = this;
 
     if (redirect) return <Redirect to={redirect} />;
@@ -148,7 +149,8 @@ class ModifyRelationshipType extends React.Component {
               type="text"
               id="aisToB"
               name="aisToB"
-              value={getValueFor(relationshipType.aisToB)}
+              value={_.get(relationshipType, "aisToB", "")}
+              // value={getValueFor(relationshipType.aisToB)}
               onChange={aisToBChangeHandler.bind(this)}
             />
           </label>
@@ -185,7 +187,7 @@ class ModifyRelationshipType extends React.Component {
           <br />
         </div>
 
-        {relationshipTypeId !== 'add' && !relationshipType.retired && (
+        {relationshipTypeId !== "add" && !relationshipType.retired && (
           <div>
             <hr />
 
@@ -210,7 +212,7 @@ class ModifyRelationshipType extends React.Component {
           </div>
         )}
 
-        {relationshipTypeId !== 'add' && relationshipType.retired && (
+        {relationshipTypeId !== "add" && relationshipType.retired && (
           <div>
             <hr />
 
@@ -223,7 +225,7 @@ class ModifyRelationshipType extends React.Component {
           </div>
         )}
 
-        {relationshipTypeId !== 'add' && (
+        {relationshipTypeId !== "add" && (
           <div>
             <hr />
 

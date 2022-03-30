@@ -2,10 +2,12 @@ import { Link } from "react-router-dom";
 import { PRIMARY_LINK } from "../styles/bootstrap";
 import React from "react";
 
-function NavBar() {
+function NavigationBar() {
   return (
     <div className="d-flex justify-content-center fixed">
-      Address Hierarchy
+      <Link to="/addressHierarchy" className={PRIMARY_LINK}>
+        Address Hierarchy
+      </Link>
       <Link to="/relationshipType" className={PRIMARY_LINK}>
         Patient Relationships
       </Link>
@@ -29,4 +31,4 @@ function NavBar() {
   );
 }
 
-export default NavBar;
+export default NavigationBar;

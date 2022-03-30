@@ -1,46 +1,46 @@
-import { Redirect, withRouter } from 'react-router-dom';
+import { Redirect, withRouter } from "react-router-dom";
 import {
   createPersonAttributeType,
   deletePersonAttributeTypeById,
   getPersonAttributeTypeById,
-  updatePersonAttributeTypeById,
-} from '../../api/services';
+  updatePersonAttributeTypeById
+} from "../../api/services";
 
-import FORMATS from '../../constants/formats';
-import React from 'react';
-import Select from 'react-select';
+import FORMATS from "../../constants/formats";
+import React from "react";
+import Select from "react-select";
 
 class ModifyPersonAttributeType extends React.Component {
   constructor(props) {
     super(props);
 
     const initialPersonAttributeType = {
-      name: '',
-      description: '',
-      editPrevilige: '',
-      foreignKey: '',
-      format: '',
-      retireReason: '',
+      name: "",
+      description: "",
+      editPrevilige: "",
+      foreignKey: "",
+      format: "",
+      retireReason: "",
       retired: false,
-      searchable: false,
+      searchable: false
     };
 
     this.state = {
       personAttributeType: initialPersonAttributeType,
       personAttributeTypeId: this.props.match.params.id,
       redirect: null,
-      isLoading: true,
+      isLoading: true
     };
   }
 
   componentDidMount() {
     const { personAttributeTypeId } = this.state;
-    if (personAttributeTypeId !== 'add') {
+    if (personAttributeTypeId !== "add") {
       getPersonAttributeTypeById(personAttributeTypeId)
         .then((response) => {
           this.setState({
             personAttributeType: response.data,
-            isLoading: false,
+            isLoading: false
           });
         })
         .catch((error) => {
@@ -63,7 +63,7 @@ class ModifyPersonAttributeType extends React.Component {
 
   savePersonAttributeType() {
     const { personAttributeTypeId, personAttributeType } = this.state;
-    if (personAttributeTypeId === 'add')
+    if (personAttributeTypeId === "add")
       this.createPersonAttributeTypeWithData(personAttributeType);
     else
       this.updatePersonAttributeTypeWithData(
@@ -75,7 +75,7 @@ class ModifyPersonAttributeType extends React.Component {
   createPersonAttributeTypeWithData(personAttributeType) {
     createPersonAttributeType(personAttributeType)
       .then(() => {
-        this.setState({ redirect: '/personAttributeType' });
+        this.setState({ redirect: "/personAttributeType" });
       })
       .catch((error) => {
         console.log(error);
@@ -88,7 +88,7 @@ class ModifyPersonAttributeType extends React.Component {
   ) {
     updatePersonAttributeTypeById(personAttributeTypeId, personAttributeType)
       .then(() => {
-        this.setState({ redirect: '/personAttributeType' });
+        this.setState({ redirect: "/personAttributeType" });
       })
       .catch((error) => {
         console.log(error);
@@ -114,7 +114,7 @@ class ModifyPersonAttributeType extends React.Component {
 
   unretirePersonAttributeType() {
     const { personAttributeTypeId, personAttributeType } = this.state;
-    personAttributeType.retireReason = '';
+    personAttributeType.retireReason = "";
     personAttributeType.retired = false;
     this.setState({ personAttributeType }, () => {
       this.updatePersonAttributeTypeWithData(
@@ -128,7 +128,7 @@ class ModifyPersonAttributeType extends React.Component {
     const { personAttributeTypeId } = this.state;
     deletePersonAttributeTypeById(personAttributeTypeId)
       .then(() => {
-        this.setState({ redirect: '/personAttributeType' });
+        this.setState({ redirect: "/personAttributeType" });
       })
       .catch((error) => {
         console.log(error);
@@ -148,12 +148,16 @@ class ModifyPersonAttributeType extends React.Component {
   }
 
   getValueFor(field) {
-    return field === null ? '' : field;
+    return field === null ? "" : field;
   }
 
   render() {
-    const { personAttributeType, personAttributeTypeId, redirect, isLoading } =
-      this.state;
+    const {
+      personAttributeType,
+      personAttributeTypeId,
+      redirect,
+      isLoading
+    } = this.state;
 
     const {
       nameChangeHandler,
@@ -165,7 +169,7 @@ class ModifyPersonAttributeType extends React.Component {
       deletePersonAttributeType,
       formatChangeHandler,
       searchableChangeHandler,
-      getValueFor,
+      getValueFor
     } = this;
 
     if (redirect) return <Redirect to={redirect} />;
@@ -174,7 +178,7 @@ class ModifyPersonAttributeType extends React.Component {
       (option) => option.value === personAttributeType.format
     );
 
-    if (!isLoading || personAttributeTypeId === 'add') {
+    if (!isLoading || personAttributeTypeId === "add") {
       return (
         <React.Fragment>
           <div>
@@ -192,7 +196,7 @@ class ModifyPersonAttributeType extends React.Component {
 
             <label htmlFor="format">
               Format:
-              <div style={{ width: '300px', display: 'inline-block' }}>
+              <div style={{ width: "300px", display: "inline-block" }}>
                 <Select
                   id="format"
                   name="format"
@@ -237,7 +241,7 @@ class ModifyPersonAttributeType extends React.Component {
             <br />
           </div>
 
-          {personAttributeTypeId !== 'add' && !personAttributeType.retired && (
+          {personAttributeTypeId !== "add" && !personAttributeType.retired && (
             <div>
               <hr />
 
@@ -265,7 +269,7 @@ class ModifyPersonAttributeType extends React.Component {
             </div>
           )}
 
-          {personAttributeTypeId !== 'add' && personAttributeType.retired && (
+          {personAttributeTypeId !== "add" && personAttributeType.retired && (
             <div>
               <hr />
 
@@ -281,7 +285,7 @@ class ModifyPersonAttributeType extends React.Component {
             </div>
           )}
 
-          {personAttributeTypeId !== 'add' && (
+          {personAttributeTypeId !== "add" && (
             <div>
               <hr />
 

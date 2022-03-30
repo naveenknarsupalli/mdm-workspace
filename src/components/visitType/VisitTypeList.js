@@ -1,58 +1,71 @@
-import { Link } from 'react-router-dom';
-import React from 'react';
-import { getVisitTypes } from '../../api/services';
+import { Link } from "react-router-dom";
+import React, { Fragment } from "react";
+import { getVisitTypes } from "../../api/services";
+import MaterialTable from "material-table";
 
 class VisitTypeList extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       visitTypes: [],
+      isLoading: true
     };
   }
 
   componentDidMount() {
-    getVisitTypes()
-      .then((response) => {
-        this.setState({ visitTypes: response.data });
-      })
-      .catch((error) => {
-        console.log(error);
+    this.setVisitTypes()
+      .finally(() => this.setLoadingFalse())
+      .catch((e) => console.log(e.message));
+  }
+
+  setVisitTypes() {
+    return new Promise((resolve, reject) => {
+      getVisitTypes()
+        .then((response) => {
+          this.setState({ visitTypes: response.data }, () => {
+            resolve("success");
+          });
+        })
+        .catch((e) => reject(e));
+    });
+  }
+
+  setLoadingFalse() {
+    return new Promise((resolve) => {
+      this.setState({ isLoading: false }, () => {
+        resolve("success");
       });
+    });
   }
 
   render() {
-    const { visitTypes } = this.state;
+    const { visitTypes, isLoading } = this.state;
+    const columns = [
+      {
+        title: "Name",
+        field: "name",
+        render: (rowData) => (
+          <Link to={`/visitType/${rowData.uuid}`}>{rowData.name}</Link>
+        )
+      },
+      {
+        title: "Description",
+        field: "description"
+      }
+    ];
 
-    if (visitTypes.length === 0)
-      return <p>no visit types exist. create a new one.</p>;
+    if (isLoading) return <p>loading...</p>;
 
     return (
-      <React.Fragment>
-        <table>
-          <thead>
-            <tr>
-              <th>Current Visit Types</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            <tr>
-              <td>Name</td>
-              <td>Description</td>
-            </tr>
-            {visitTypes.map((visitType) => (
-              <tr key={visitType.uuid}>
-                <td>
-                  <Link to={`/visitType/${visitType.uuid}`}>
-                    {visitType.name}
-                  </Link>
-                </td>
-                <td>{visitType.description}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </React.Fragment>
+      <Fragment>
+        <div style={{ maxWidth: "80%", margin: "auto" }}>
+          <MaterialTable
+            title="Visit Types"
+            data={visitTypes}
+            columns={columns}
+          />
+        </div>
+      </Fragment>
     );
   }
 }

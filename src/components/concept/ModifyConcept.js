@@ -1,11 +1,15 @@
 import React, { Fragment } from "react";
 import { Redirect, withRouter } from "react-router-dom";
+
 import {
   deleteConceptById,
   getConceptById,
   getConceptClasses,
   getConceptDataTypes,
+  getConceptMapTypes,
   getConceptNames,
+  getConceptReferenceTerms,
+  getConceptReferenceSources,
   getDrugs,
   postConcept,
   putConceptById
@@ -36,8 +40,8 @@ class ModifyConcept extends React.Component {
         precise: false,
         displayPrecision: null
       },
-      datatypeId: {
-        conceptDatatypeId: 1
+      dataTypeId: {
+        conceptDataTypeId: 1
       },
       conceptNames: [
         {
@@ -46,7 +50,7 @@ class ModifyConcept extends React.Component {
         },
         {
           name: "",
-          conceptNameType: "INDEX_TERM"
+          conceptNameType: ""
         }
       ],
       conceptAnswers: [
@@ -66,13 +70,13 @@ class ModifyConcept extends React.Component {
       conceptComplex: "",
       mappings: [
         {
-          conceptReferenceTermId: 34,
-          conceptMapTypeId: 43
-        },
-        {
-          conceptReferenceTermId: 4,
-          conceptMapTypeId: 33
+          conceptReferenceTermId: null,
+          conceptMapTypeId: 2
         }
+        // {
+        //   conceptReferenceTermId: 4,
+        //   conceptMapTypeId: 33
+        // }
       ],
       conceptSets: [{ conceptId: 4 }, { conceptId: 5 }]
     };
@@ -81,10 +85,15 @@ class ModifyConcept extends React.Component {
       concept: initialConceptState,
       redirect: null,
       conceptId: this.props.match.params.id,
+      dataType: 1,
       classOptions: [],
       conceptOptions: [],
       drugOptions: [],
       dataTypeOptions: [],
+      mapRelationshipOptions: [],
+      mapSourceOptions: [],
+      mapReferenceTermOptions: [],
+
       synonyms: initialConceptState.conceptNames.filter(
         (item) => item.conceptNameType !== "FULLY_SPECIFIED"
       ),
@@ -94,6 +103,15 @@ class ModifyConcept extends React.Component {
       this
     );
     this.synonymNameChangeHandler = this.synonymNameChangeHandler.bind(this);
+    this.removeMappingButtonHandler = this.removeMappingButtonHandler.bind(
+      this
+    );
+    this.conceptMapTypeIdChangeHandler = this.conceptMapTypeIdChangeHandler.bind(
+      this
+    );
+    this.getDefaultConceptMapTypeId = this.getDefaultConceptMapTypeId.bind(
+      this
+    );
   }
 
   mergeConceptnames() {
@@ -238,7 +256,7 @@ class ModifyConcept extends React.Component {
 
   dataTypeChangeHandler(selectedOption) {
     const { concept } = this.state;
-    concept.datatypeId.conceptDatatypeId = selectedOption.value;
+    concept.dataTypeId.conceptDataTypeId = selectedOption.value;
     this.setState({ concept });
   }
 
@@ -249,94 +267,203 @@ class ModifyConcept extends React.Component {
   }
 
   componentDidMount() {
-    const { conceptId } = this.state;
+    this.setClassOptions()
+      .then(() => this.setConceptOptions())
+      .then(() => this.setDrugOptions())
+      .then(() => this.setDataTypeOptions())
+      .then(() => this.setMapRelationshipOptions())
+      .then(() => this.setMapSourceOptions())
+      .then(() => this.setMapReferenceTermOptions())
+      .then(() => this.setFetchedConcept())
+      // .then(() => this.setDatatype())
+      .then(() => this.setSynonyms())
+      .then(() => this.setState({ isLoading: false }));
+  }
 
-    getConceptClasses()
-      .then((response) => {
-        const classOptions = [];
-        Object.keys(response.data).forEach((key) => {
-          classOptions.push({
-            label: response.data[key].name,
-            value: response.data[key].conceptClassId
+  setClassOptions() {
+    return new Promise((resolve, reject) => {
+      getConceptClasses()
+        .then((response) => {
+          const classOptions = [];
+          Object.keys(response.data).forEach((key) => {
+            classOptions.push({
+              label: response.data[key].name,
+              value: response.data[key].conceptClassId
+            });
           });
-        });
-        this.setState({ classOptions }, () => {
-          getConceptNames()
-            .then((response) => {
-              const conceptOptions = [];
-              Object.keys(response.data).forEach((key) => {
-                conceptOptions.push({
-                  label: response.data[key].name,
-                  value: response.data[key].conceptId
-                });
-              });
-              this.setState({ conceptOptions }, () => {
-                getDrugs()
-                  .then((response) => {
-                    const drugOptions = [];
-                    Object.keys(response.data).forEach((key) => {
-                      drugOptions.push({
-                        label: response.data[key].name,
-                        value: response.data[key].drugId
-                      });
-                    });
-                    this.setState({ drugOptions }, () => {
-                      getConceptDataTypes()
-                        .then((response) => {
-                          const dataTypeOptions = [];
-                          Object.keys(response.data).forEach((key) => {
-                            dataTypeOptions.push({
-                              label: response.data[key].name,
-                              value: response.data[key].conceptDatatypeId
-                            });
-                          });
-                          this.setState({ dataTypeOptions }, () => {
-                            if (conceptId !== "add") {
-                              getConceptById(conceptId)
-                                .then((response) => {
-                                  this.setState(
-                                    {
-                                      concept: response.data
-                                    },
-                                    () => {
-                                      const {
-                                        conceptNames
-                                      } = this.state.concept;
-                                      const synonyms = conceptNames.filter(
-                                        (item) =>
-                                          item.conceptNameType !==
-                                          "FULLY_SPECIFIED"
-                                      );
-                                      if (synonyms.length === 0) {
-                                        synonyms.push({
-                                          name: "",
-                                          conceptNameType: "INDEX_TERM"
-                                        });
-                                      }
+          this.setState({ classOptions }, () => {
+            resolve("success");
+          });
+        })
+        .catch((e) => reject(e));
+    });
+  }
 
-                                      this.setState({
-                                        synonyms,
-                                        isLoading: false
-                                      });
-                                    }
-                                  );
-                                })
-                                .catch((error) => console.log(error));
-                            } else {
-                              this.setState({ isLoading: false });
-                            }
-                          });
-                        })
-                        .catch((error) => console.log(error));
-                    });
-                  })
-                  .catch((error) => console.log(error));
-              });
-            })
-            .catch((error) => console.log(error));
+  setConceptOptions() {
+    return new Promise((resolve, reject) => {
+      getConceptNames()
+        .then((response) => {
+          const conceptOptions = [];
+          Object.keys(response.data).forEach((key) => {
+            conceptOptions.push({
+              label: response.data[key].name,
+              value: response.data[key].conceptId
+            });
+          });
+          this.setState({ conceptOptions }, () => {
+            resolve("success");
+          });
+        })
+        .catch((e) => reject(e));
+    });
+  }
+
+  setDrugOptions() {
+    return new Promise((resolve, reject) => {
+      getDrugs()
+        .then((response) => {
+          const dataTypeOptions = [];
+          Object.keys(response.data).forEach((key) => {
+            dataTypeOptions.push({
+              label: response.data[key].name,
+              value: response.data[key].conceptDataTypeId
+            });
+          });
+          this.setState({ dataTypeOptions }, () => {
+            resolve("success");
+          });
+        })
+        .catch((e) => reject(e));
+    });
+  }
+
+  setDataTypeOptions() {
+    return new Promise((resolve, reject) => {
+      getConceptDataTypes()
+        .then((response) => {
+          const dataTypeOptions = [];
+          Object.keys(response.data).forEach((key) => {
+            dataTypeOptions.push({
+              label: response.data[key].name,
+              value: response.data[key].conceptDatatypeId
+            });
+          });
+          this.setState({ dataTypeOptions }, () => {
+            resolve("success");
+          });
+        })
+        .catch((e) => reject(e));
+    });
+  }
+
+  setMapRelationshipOptions() {
+    return new Promise((resolve, reject) => {
+      getConceptMapTypes()
+        .then((response) => {
+          const mapRelationshipOptions = [];
+          Object.keys(response.data).forEach((key) => {
+            mapRelationshipOptions.push({
+              label: response.data[key].name,
+              value: response.data[key].conceptMapTypeId
+            });
+          });
+          this.setState({ mapRelationshipOptions }, () => {
+            resolve("success");
+          });
+        })
+        .catch((e) => reject(e));
+    });
+  }
+
+  setMapSourceOptions() {
+    return new Promise((resolve, reject) => {
+      getConceptReferenceSources()
+        .then((response) => {
+          const mapSourceOptions = [];
+          Object.keys(response.data).forEach((key) => {
+            mapSourceOptions.push({
+              label: response.data[key].name,
+              value: response.data[key].conceptSourceId
+            });
+          });
+          this.setState({ mapSourceOptions }, () => {
+            resolve("success");
+          });
+        })
+        .catch((e) => reject(e));
+    });
+  }
+
+  setMapReferenceTermOptions() {
+    return new Promise((resolve, reject) => {
+      getConceptReferenceTerms()
+        .then((response) => {
+          const mapReferenceTermOptions = [];
+          Object.keys(response.data).forEach((key) => {
+            mapReferenceTermOptions.push({
+              label: response.data[key].code,
+              value: response.data[key].conceptReferenceTermId,
+              conceptSourceId:
+                response.data[key].conceptSourceId["conceptSourceId"]
+            });
+          });
+          this.setState({ mapReferenceTermOptions }, () => {
+            resolve("success");
+          });
+        })
+        .catch((e) => reject(e));
+    });
+  }
+
+  setDatatype() {
+    const { concept } = this.state;
+
+    return new Promise((resolve) => {
+      this.setState({ dataType: concept.dataTypeId.conceptDataTypeId }, () =>
+        resolve("success")
+      );
+    });
+  }
+
+  setFetchedConcept() {
+    const { conceptId } = this.state;
+    return new Promise((resolve, reject) => {
+      if (conceptId !== "add") {
+        getConceptById(conceptId)
+          .then((response) => {
+            console.log(response.data);
+            this.setState(
+              { concept: response.data },
+              () => {
+                this.setState(
+                  { dataType: response.data.dataTypeId.conceptDataTypeId },
+                  () => resolve("success")
+                );
+              }
+              // () => resolve("success")
+            );
+          })
+          .catch((e) => reject(e));
+      } else {
+        resolve("success");
+      }
+    });
+  }
+
+  setSynonyms() {
+    const { conceptNames } = this.state.concept;
+    return new Promise((resolve) => {
+      const synonyms = conceptNames.filter(
+        (item) => item.conceptNameType !== ("FULLY_SPECIFIED" || "SHORT")
+      );
+      if (synonyms.length === 0) {
+        synonyms.push({
+          name: "",
+          conceptNameType: "INDEX_TERM"
         });
-      })
-      .catch((error) => console.log(error));
+      }
+      this.setState({ synonyms }, () => resolve("success"));
+    });
   }
 
   getDefaultConceptSetsValue() {
@@ -455,47 +582,11 @@ class ModifyConcept extends React.Component {
     this.setState({ concept });
   }
 
-  hiAbsoluteChangeHandler(event) {
+  numericChangeHandler = (event, name, type = "value") => {
     const { concept } = this.state;
-    concept.conceptNumeric["hiAbsolute"] = event.target.value;
+    concept.conceptNumeric[`${name}`] = event.target[`${type}`];
     this.setState({ concept });
-  }
-
-  hiCriticalChangeHandler(event) {
-    const { concept } = this.state;
-    concept.conceptNumeric["hiCritical"] = event.target.value;
-    this.setState({ concept });
-  }
-
-  hiNormalChangeHandler(event) {
-    const { concept } = this.state;
-    concept.conceptNumeric["hiNormal"] = event.target.value;
-    this.setState({ concept });
-  }
-
-  lowAbsoluteChangeHandler(event) {
-    const { concept } = this.state;
-    concept.conceptNumeric["lowAbsolute"] = event.target.value;
-    this.setState({ concept });
-  }
-
-  lowCriticalChangeHandler(event) {
-    const { concept } = this.state;
-    concept.conceptNumeric["lowCritical"] = event.target.value;
-    this.setState({ concept });
-  }
-
-  lowNormalChangeHandler(event) {
-    const { concept } = this.state;
-    concept.conceptNumeric["lowNormal"] = event.target.value;
-    this.setState({ concept });
-  }
-
-  preciseChangeHandler(event) {
-    const { concept } = this.state;
-    concept.conceptNumeric["precise"] = event.target.checked;
-    this.setState({ concept });
-  }
+  };
 
   filterOptions(option, inputValue) {
     const { label, value } = option;
@@ -541,6 +632,38 @@ class ModifyConcept extends React.Component {
     this.setState({ synonyms: syns });
   }
 
+  addMappingButtonHandler() {
+    const { concept } = this.state;
+    const maps = [...concept.mappings];
+    maps.push({
+      conceptReferenceTermId: null,
+      conceptMapTypeId: null
+    });
+    concept.mappings = maps;
+    this.setState({ concept });
+  }
+
+  removeMappingButtonHandler(index) {
+    const { concept } = this.state;
+    const maps = [...concept.mappings];
+    maps.splice(index, 1);
+    concept.mappings = maps;
+    this.setState({ concept });
+  }
+
+  conceptMapTypeIdChangeHandler(selectedOption, index) {
+    const { concept } = this.state;
+    concept.mappings[index].conceptMapTypeId = selectedOption.value;
+    this.setState({ concept });
+  }
+
+  getDefaultConceptMapTypeId(index) {
+    const { concept, mapRelationshipOptions } = this.state;
+    return mapRelationshipOptions.filter(
+      (option) => option.value === concept.mappings[index].conceptMapTypeId
+    );
+  }
+
   render() {
     const {
       unretire,
@@ -560,13 +683,6 @@ class ModifyConcept extends React.Component {
       getValueFor,
       conceptSetsChangeHandler,
       getDefaultConceptSetsValue,
-      hiAbsoluteChangeHandler,
-      hiCriticalChangeHandler,
-      hiNormalChangeHandler,
-      lowAbsoluteChangeHandler,
-      lowCriticalChangeHandler,
-      lowNormalChangeHandler,
-      preciseChangeHandler,
       filterOptions,
       getDefaultAnswerConceptValue,
       getDefaultAnswerDrugValue,
@@ -575,7 +691,12 @@ class ModifyConcept extends React.Component {
       fullySpecifiedNameChangeHandler,
       synonymNameChangeHandler,
       addSynonymButtonHandler,
-      removeSynonymButtonHandler
+      removeSynonymButtonHandler,
+      numericChangeHandler,
+      addMappingButtonHandler,
+      removeMappingButtonHandler,
+      conceptMapTypeIdChangeHandler,
+      getDefaultConceptMapTypeId
     } = this;
 
     const {
@@ -587,11 +708,18 @@ class ModifyConcept extends React.Component {
       drugOptions,
       dataTypeOptions,
       isLoading,
-      synonyms
+      synonyms,
+      mapRelationshipOptions,
+      dataType
     } = this.state;
 
-    const dataType = concept.datatypeId.conceptDatatypeId;
-    const { conceptNumeric, conceptNames } = concept;
+    // const dataType = concept.dataTypeId.conceptDataTypeId;
+
+    // const dataType =
+    //   concept.datatypeId !== undefined
+    //     ? concept.datatypeId.conceptDatatypeId
+    //     : 4;
+    const { conceptNumeric, conceptNames, mappings } = concept;
 
     const getFullySpecifiedName = () => {
       const fullySpecifiedNameObject = conceptNames.find(
@@ -634,6 +762,47 @@ class ModifyConcept extends React.Component {
           )}
 
           <form>
+            <label>Mappings:</label>
+            <div>
+              <button
+                type="button"
+                onClick={addMappingButtonHandler.bind(this)}
+              >
+                Add Mapping
+              </button>
+            </div>
+            {mappings.map((item, index) => (
+              <div key={index}>
+                <div>
+                  <div style={{ width: "300px", display: "inline-block" }}>
+                    <Select
+                      id="conceptMapTypeId"
+                      name="conceptMapTypeId"
+                      defaultValue={() => getDefaultConceptMapTypeId(index)}
+                      onChange={(selectedOption) =>
+                        conceptMapTypeIdChangeHandler(selectedOption, index)
+                      }
+                      options={mapRelationshipOptions}
+                    />
+                  </div>
+                  <input
+                    name="name"
+                    type="text"
+                    id="name"
+                    value={item.name}
+                    onChange={(e) => synonymNameChangeHandler(e, index)}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeMappingButtonHandler(index)}
+                  >
+                    Remove
+                  </button>
+                </div>
+              </div>
+            ))}
+            <br />
+
             <label htmlFor="fullySpecifiedName">
               Fully Specified Name:
               <input
@@ -780,8 +949,10 @@ class ModifyConcept extends React.Component {
                     type="text"
                     id="hiAbsolute"
                     name="hiAbsolute"
-                    value={getValueFor(conceptNumeric.hiAbsolute)}
-                    onChange={hiAbsoluteChangeHandler.bind(this)}
+                    value={getValueFor(
+                      conceptNumeric === null ? "" : conceptNumeric.hiAbsolute
+                    )}
+                    onChange={(e) => numericChangeHandler(e, "hiAbsolute")}
                   />
                 </label>
                 <br />
@@ -792,8 +963,10 @@ class ModifyConcept extends React.Component {
                     type="text"
                     id="hiCritical"
                     name="hiCritical"
-                    value={getValueFor(conceptNumeric.hiCritical)}
-                    onChange={hiCriticalChangeHandler.bind(this)}
+                    value={getValueFor(
+                      conceptNumeric === null ? "" : conceptNumeric.hiCritical
+                    )}
+                    onChange={(e) => numericChangeHandler(e, "hiCritical")}
                   />
                 </label>
                 <br />
@@ -804,8 +977,10 @@ class ModifyConcept extends React.Component {
                     type="text"
                     id="hiNormal"
                     name="hiNormal"
-                    value={getValueFor(conceptNumeric.hiNormal)}
-                    onChange={hiNormalChangeHandler.bind(this)}
+                    value={getValueFor(
+                      conceptNumeric === null ? "" : conceptNumeric.hiNormal
+                    )}
+                    onChange={(e) => numericChangeHandler(e, "hiNormal")}
                   />
                 </label>
                 <br />
@@ -816,8 +991,10 @@ class ModifyConcept extends React.Component {
                     type="text"
                     id="lowAbsolute"
                     name="lowAbsolute"
-                    value={getValueFor(conceptNumeric.lowAbsolute)}
-                    onChange={lowAbsoluteChangeHandler.bind(this)}
+                    value={getValueFor(
+                      conceptNumeric === null ? "" : conceptNumeric.lowAbsolute
+                    )}
+                    onChange={(e) => numericChangeHandler(e, "lowAbsolute")}
                   />
                 </label>
                 <br />
@@ -828,8 +1005,10 @@ class ModifyConcept extends React.Component {
                     type="text"
                     id="lowCritical"
                     name="lowCritical"
-                    value={getValueFor(conceptNumeric.lowCritical)}
-                    onChange={lowCriticalChangeHandler.bind(this)}
+                    value={getValueFor(
+                      conceptNumeric === null ? "" : conceptNumeric.lowCritical
+                    )}
+                    onChange={(e) => numericChangeHandler(e, "lowCritical")}
                   />
                 </label>
                 <br />
@@ -840,8 +1019,10 @@ class ModifyConcept extends React.Component {
                     type="text"
                     id="lowNormal"
                     name="lowNormal"
-                    value={getValueFor(conceptNumeric.lowNormal)}
-                    onChange={lowNormalChangeHandler.bind(this)}
+                    value={getValueFor(
+                      conceptNumeric === null ? "" : conceptNumeric.lowNormal
+                    )}
+                    onChange={(e) => numericChangeHandler(e, "lowNormal")}
                   />
                 </label>
                 <br />
@@ -852,8 +1033,12 @@ class ModifyConcept extends React.Component {
                     type="checkbox"
                     id="precise"
                     name="precise"
-                    checked={getValueFor(conceptNumeric.precise)}
-                    onChange={preciseChangeHandler.bind(this)}
+                    checked={getValueFor(
+                      conceptNumeric === null ? "" : conceptNumeric.precise
+                    )}
+                    onChange={(e) =>
+                      numericChangeHandler(e, "precise", "checked")
+                    }
                   />
                 </label>
                 <br />
@@ -864,7 +1049,11 @@ class ModifyConcept extends React.Component {
                     type="text"
                     id="displayPrecision"
                     name="displayPrecision"
-                    value={getValueFor(conceptNumeric.displayPrecision)}
+                    value={getValueFor(
+                      conceptNumeric === null
+                        ? ""
+                        : conceptNumeric.displayPrecision
+                    )}
                     readOnly="true"
                     disabled="true"
                   />
@@ -907,15 +1096,6 @@ class ModifyConcept extends React.Component {
                 <br />
               </div>
             )}
-
-            {/* {dataType === 2 && (
-              <CodedDatatype
-                conceptAnswers={concept.conceptAnswers}
-                conceptOptions={conceptOptions}
-                drugOptions={drugOptions}
-                collectCodedInfo={collectCodedInfo}
-              />
-            )} */}
 
             {dataType === 13 && (
               <div>

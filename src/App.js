@@ -1,6 +1,7 @@
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 
+import React, { Fragment } from "react";
 import { Route, Switch } from "react-router-dom";
 
 import ConceptClassPage from "./pages/ConceptClassPage";
@@ -14,19 +15,55 @@ import ModifyPersonAttributeType from "./components/personAttributeType/ModifyPe
 import ModifyPrivilege from "./components/privilege/ModifyPrivilege";
 import ModifyRelationshipType from "./components/relationshipType/ModifyRelationshipType";
 import ModifyVisitType from "./components/visitType/ModifyVisitType";
-import NavBar from "./pages/NavBar";
 import PersonAttributeTypePage from "./pages/PersonAttributeTypePage";
 import PrivilegePage from "./pages/PrivilegePage";
-import React from "react";
 import RelationshipTypePage from "./pages/RelationshipTypePage";
 import VisitTypePage from "./pages/VisitTypePage";
 import UserPage from "./pages/UserPage";
+import AddressHierarchyPage from "./pages/AddressHierarchyPage";
+import NavigationBar from "./pages/NavigationBar";
 
 function App() {
   return (
-    <React.Fragment>
-      <NavBar />
+    <Fragment>
+      <NavigationBar />
       <Switch>
+        <Route path="/addressHierarchy">
+          <AddressHierarchyPage />
+        </Route>
+
+        <Route path="/relationshipType/:id">
+          <ModifyRelationshipType />
+        </Route>
+        <Route path="/relationshipType">
+          <RelationshipTypePage />
+        </Route>
+
+        <Route path="/personAttributeType/:id">
+          <ModifyPersonAttributeType />
+        </Route>
+        <Route path="/personAttributeType">
+          <PersonAttributeTypePage />
+        </Route>
+
+        <Route path="/user">
+          <UserPage />
+        </Route>
+
+        <Route path="/visitType/:id">
+          <ModifyVisitType />
+        </Route>
+        <Route path="/visitType">
+          <VisitTypePage />
+        </Route>
+
+        <Route path="/drug/:id">
+          <ModifyDrug />
+        </Route>
+        <Route path="/drug">
+          <DrugPage />
+        </Route>
+
         <Route path="/dependentForms">
           <DependentFormsPage />
         </Route>
@@ -45,46 +82,14 @@ function App() {
           <ConceptClassPage />
         </Route>
 
-        <Route path="/drug/:id">
-          <ModifyDrug />
-        </Route>
-        <Route path="/drug">
-          <DrugPage />
-        </Route>
-
-        <Route path="/relationshipType/:id">
-          <ModifyRelationshipType />
-        </Route>
-        <Route path="/relationshipType">
-          <RelationshipTypePage />
-        </Route>
-
         <Route path="/privilege/:id">
           <ModifyPrivilege />
         </Route>
         <Route path="/privilege">
           <PrivilegePage />
         </Route>
-
-        <Route path="/visitType/:id">
-          <ModifyVisitType />
-        </Route>
-        <Route path="/visitType">
-          <VisitTypePage />
-        </Route>
-
-        <Route path="/personAttributeType/:id">
-          <ModifyPersonAttributeType />
-        </Route>
-        <Route path="/personAttributeType">
-          <PersonAttributeTypePage />
-        </Route>
-
-        <Route path="/user">
-          <UserPage />
-        </Route>
       </Switch>
-    </React.Fragment>
+    </Fragment>
   );
 }
 

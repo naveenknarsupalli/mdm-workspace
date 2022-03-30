@@ -1,216 +1,173 @@
 import { Link } from "react-router-dom";
-import Pagination from "../../utils/Pagination";
-import React from "react";
-import { getConcepts } from "../../api/services";
+import MaterialTable, { MTableToolbar } from "material-table";
+import { FormControlLabel, Switch } from "@material-ui/core";
+import React, { Fragment } from "react";
+import { getConceptNameDetails } from "../../api/services";
 
 class FindConcept extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       concepts: [],
-      filteredConceptsByRetired: [],
-      searchText: "",
-      showRetired: false,
-      showDetails: false,
-      currentPage: 1,
-      conceptsPerPage: 1
+      filteredConceptsOnRetired: [],
+      isLoading: true,
+      showRetired: true,
+      showDetails: true
     };
+    this.toggleRetired = this.toggleRetired.bind(this);
+    this.toggleShowDetails = this.toggleShowDetails.bind(this);
   }
 
   componentDidMount() {
-    this.loadAllConcepts();
+    this.setConcepts()
+      .then(() => this.setFilteredConceptsOnRetired())
+      .finally(() => this.setLoadingFalse())
+      .catch((e) => console.log(e.message));
   }
 
-  loadAllConcepts() {
-    getConcepts()
-      .then((response) => {
-        const loadedConcepts = [];
-        for (const key in response.data) {
-          loadedConcepts.push({
-            id: key,
-            shortName: response.data[key].shortName,
-            retired: response.data[key].retired
-          });
-          this.setState({ concepts: loadedConcepts }, () => {
-            const filteredConceptsByRetired = this.state.concepts.filter(
-              (concept) => {
-                return concept.retired === false;
-              }
-            );
-            this.setState({
-              filteredConceptsByRetired: filteredConceptsByRetired
-            });
-          });
-        }
-      })
-      .catch((error) => {
-        console.log(error);
+  componentDidUpdate(prevProps, prevState) {
+    const { showRetired } = this.state;
+
+    if (prevState.showRetired !== showRetired) {
+      this.setFilteredConceptsOnRetired();
+    }
+  }
+
+  setLoadingFalse() {
+    return new Promise((resolve) => {
+      this.setState({ isLoading: false }, () => {
+        resolve("success");
       });
+    });
   }
 
-  handleSearchTextChange(event) {
-    this.setState({ searchText: event.target.value });
+  setConcepts() {
+    return new Promise((resolve, reject) => {
+      getConceptNameDetails()
+        .then((response) => {
+          this.setState({ concepts: response.data }, () => {
+            resolve("success");
+          });
+        })
+        .catch((e) => reject(e));
+    });
+  }
+
+  setFilteredConceptsOnRetired() {
+    const { concepts, showRetired } = this.state;
+    if (showRetired) {
+      this.setState({ filteredConceptsOnRetired: concepts });
+    } else {
+      this.setState({
+        filteredConceptsOnRetired: concepts.filter(
+          (concept) => concept.retired === false
+        )
+      });
+    }
+  }
+
+  setRetired(value) {
+    return new Promise((resolve) => {
+      this.setState({ retired: value }, () => {
+        resolve("success");
+      });
+    });
   }
 
   handleShowRetired(event) {
-    this.setState({ showRetired: event.target.checked }, () => {
-      if (!this.state.showRetired) {
-        const filteredConceptsByRetired = this.state.concepts.filter(
-          (concept) => {
-            return concept.retired === false;
-          }
-        );
-        this.setState({ filteredConceptsByRetired: filteredConceptsByRetired });
-      } else {
-        this.setState({ filteredConceptsByRetired: this.state.concepts });
-      }
-      this.setState({ currentPage: 1 });
-    });
+    this.setRetired(event.target.checked)
+      .then(() => this.setFilteredConceptsOnRetired())
+      .catch((e) => console.log(e.message));
   }
 
   handleShowDetails(event) {
     this.setState({ showDetails: event.target.checked });
   }
 
-  paginate(pageNumber) {
-    this.setState({ currentPage: pageNumber });
+  toggleRetired() {
+    const { showRetired } = this.state;
+    this.setState({ showRetired: !showRetired });
   }
 
-  conceptsPerPageChangeHandler(event) {
-    this.setState({ conceptsPerPage: event.target.value }, () => {
-      this.setState({ currentPage: 1 });
-    });
+  toggleShowDetails() {
+    const { showDetails } = this.state;
+    this.setState({ showDetails: !showDetails });
   }
-
   render() {
-    const {
-      handleSearchTextChange,
-      handleShowRetired,
-      handleShowDetails,
-      paginate,
-      conceptsPerPageChangeHandler
-    } = this;
+    const { toggleRetired, toggleShowDetails } = this;
 
     const {
-      filteredConceptsByRetired,
-      searchText,
+      filteredConceptsOnRetired,
       showRetired,
       showDetails,
-      currentPage,
-      conceptsPerPage
+      isLoading
     } = this.state;
 
-    const filteredConcepts =
-      searchText &&
-      filteredConceptsByRetired.filter((concept) => {
-        return (
-          concept.shortName.toLowerCase().includes(searchText) ||
-          concept.id.includes(searchText)
-        );
-      });
+    const nameColumn = {
+      title: "Name",
+      field: "conceptName",
+      render: (rowData) => (
+        <Link to={`/concept/${rowData.uuid}`}>{rowData.conceptName}</Link>
+      )
+    };
 
-    // get current concepts
-    const indexOfLastConcept = currentPage * conceptsPerPage;
-    const indexOfFirstConcept = indexOfLastConcept - conceptsPerPage;
-    const currentConcepts = filteredConcepts.slice(
-      indexOfFirstConcept,
-      indexOfLastConcept
-    );
+    const idColumn = {
+      title: "Concept ID",
+      field: "conceptId"
+    };
+
+    const columnsWithDetails = [nameColumn, idColumn];
+    const columnsWithoutDetails = [nameColumn];
+    const columns = showDetails ? columnsWithDetails : columnsWithoutDetails;
+
+    const components = {
+      Toolbar: (props) => (
+        <div>
+          <MTableToolbar {...props} />
+          <div class="text-end" style={{ padding: "0px 10px" }}>
+            <FormControlLabel
+              value="start"
+              control={
+                <Switch
+                  color="primary"
+                  onClick={() => toggleRetired()}
+                  checked={showRetired}
+                />
+              }
+              label={showRetired ? "Hide Retired" : "Show Retired"}
+              labelPlacement="start"
+            />
+
+            <FormControlLabel
+              value="start"
+              control={
+                <Switch
+                  color="primary"
+                  onClick={() => toggleShowDetails()}
+                  checked={showDetails}
+                />
+              }
+              label={showDetails ? "Hide Details" : "Show Details"}
+              labelPlacement="start"
+            />
+          </div>
+        </div>
+      )
+    };
+
+    if (isLoading) return <p>loading...</p>;
 
     return (
-      <React.Fragment>
-        <table>
-          <thead>
-            <tr>
-              <td>Find Concept</td>
-            </tr>
-            <tr>
-              <td>
-                <label htmlFor="searchText">
-                  Find a concept by typing in its name or Id:
-                </label>{" "}
-                <input
-                  type="text"
-                  id="searchText"
-                  name="searchText"
-                  value={searchText}
-                  onChange={handleSearchTextChange.bind(this)}
-                />
-                <button type="button">Search</button>{" "}
-                <input
-                  type="checkbox"
-                  id="showRetired"
-                  name="showRetired"
-                  value={showRetired}
-                  onChange={handleShowRetired.bind(this)}
-                />
-                <label htmlFor="showRetired">Include Retired</label>{" "}
-                <input
-                  type="checkbox"
-                  id="showDetails"
-                  name="showDetails"
-                  value={showDetails}
-                  onChange={handleShowDetails.bind(this)}
-                />
-                <label htmlFor="showDetails">Show Details</label>
-              </td>
-            </tr>
-          </thead>
-          <tbody>
-            {searchText &&
-              currentConcepts.map((concept) => {
-                return (
-                  <tr key={concept.id}>
-                    <td>
-                      <Link to={`/concept/${concept.id}`}>
-                        <p>{concept.shortName}</p>
-                        {showDetails && <p>{concept.id}</p>}
-                      </Link>
-                    </td>
-                  </tr>
-                );
-              })}
-          </tbody>
-          <tfoot>
-            <tr>
-              <td>
-                {searchText && (
-                  <div className="container">
-                    <span>
-                      Showing {indexOfFirstConcept + 1} to{" "}
-                      {indexOfLastConcept > filteredConcepts.length
-                        ? filteredConcepts.length
-                        : indexOfLastConcept}{" "}
-                      of {filteredConcepts.length} entries
-                    </span>
-                    <Pagination
-                      itemsPerPage={conceptsPerPage}
-                      totalItems={filteredConcepts.length}
-                      paginate={paginate.bind(this)}
-                    />
-                  </div>
-                )}
-              </td>
-            </tr>
-            {searchText && (
-              <tr>
-                Show
-                <select
-                  name="conceptsPerPage"
-                  id="conceptsPerPage"
-                  onChange={conceptsPerPageChangeHandler.bind(this)}
-                >
-                  <option value="1">1</option>
-                  <option value="2">2</option>
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                </select>
-                entries
-              </tr>
-            )}
-          </tfoot>
-        </table>
-      </React.Fragment>
+      <Fragment>
+        <div style={{ maxWidth: "80%", margin: "auto" }}>
+          <MaterialTable
+            title="Concepts"
+            data={filteredConceptsOnRetired}
+            columns={columns}
+            components={components}
+          />
+        </div>
+      </Fragment>
     );
   }
 }

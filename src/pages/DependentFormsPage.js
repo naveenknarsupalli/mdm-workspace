@@ -14,9 +14,6 @@ function DependentFormsPage() {
       <Link to="/privilege" className={SECONDARY_LINK}>
         Privilege
       </Link>
-      <Link to="/testConcept/add" className={SECONDARY_LINK}>
-        Test Concept
-      </Link>
     </React.Fragment>
   );
 }
